@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍭 艾宾浩斯英语打卡 · 三年级 Join in</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #f5ede6;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: #2d3a4a;
+            transition: background 0.3s;
+        }
+        body.screenshot-mode {
+            background: white !important;
+            padding: 0 !important;
+        }
+        body.screenshot-mode .container {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 10px !important;
+            max-width: 100% !important;
+        }
+        body.screenshot-mode .nav-bar,
+        body.screenshot-mode .float-deco,
+        body.screenshot-mode .screenshot-toggle {
+            display: none !important;
+        }
+        body.screenshot-mode .container::before,
+        body.screenshot-mode .container::after,
+        body.screenshot-mode .words-area::before {
+            display: none !important;
+        }
+
+        .container {
+            max-width: 1150px;
+            width: 100%;
+            background: #fffdfa;
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 20px 50px -8px rgba(0,0,0,0.12), 0 0 0 8px #f5ebe0;
+            padding: 24px 28px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: "🌸 🌼 🌻 🌷 🌺";
+            position: absolute;
+            top: -8px;
+            right: 10px;
+            font-size: 2.4rem;
+            opacity: 0.15;
+            letter-spacing: 12px;
+            pointer-events: none;
+        }
+        .container::after {
+            content: "⭐ 🌟 ✨ ☁️";
+            position: absolute;
+            bottom: 8px;
+            left: 10px;
+            font-size: 2rem;
+            opacity: 0.12;
+            letter-spacing: 18px;
+            pointer-events: none;
+        }
+
+        .screenshot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: #6f9e8a;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 3px solid white;
+            font-family: inherit;
+        }
+        .screenshot-toggle:hover { transform: scale(1.05); background: #558a74; }
+        .screenshot-toggle.active { background: #c0392b; }
+        .screenshot-toggle.active:hover { background: #a93226; }
+
+        .header {
+            background: linear-gradient(135deg, #d4e8f0, #b8dce8);
+            border-radius: 50px;
+            padding: 12px 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            position: relative;
+            border: 3px dashed #8fc1d4;
+        }
+        .header::before { content: "🌈"; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 2rem; }
+        .header::after { content: "🦄"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 2rem; }
+        .header h1 { font-size: 2rem; font-weight: 700; color: #1e3a4f; letter-spacing: 2px; }
+        .header h1 span { font-weight: 300; color: #2d5a73; }
+        .header .day-badge {
+            display: inline-block;
+            background: #ffdd99;
+            padding: 4px 22px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #7a4d2a;
+            margin-top: 2px;
+            border: 2px solid #f7c57a;
+        }
+
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 10px;
+        }
+        .nav-bar select, .nav-bar button {
+            background: white;
+            border: 2px solid #d4c9bc;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #3d4f5e;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .nav-bar button:hover { background: #f0ebe4; }
+        .nav-bar .date-indicator {
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: #f5efe9;
+            padding: 5px 20px;
+            border-radius: 40px;
+            color: #2d4055;
+            border: 2px solid #e0d5ca;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 14px;
+        }
+        .section {
+            border-radius: 30px;
+            padding: 14px 16px;
+            position: relative;
+            border: 3px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+
+        .words-area {
+            grid-row: 1 / 3;
+            background: #ffe9e0;
+            border: 3px solid #fad5c4;
+            overflow: hidden;
+        }
+        .words-area::before {
+            content: "📖 ✏️ 📚";
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            font-size: 2.8rem;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        .words-area .section-title { color: #7a4a3a; }
+        .words-area .section-title::before { content: "📖 "; }
+        .words-area table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 380px;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .words-area th {
+            background: #f5d5c4;
+            color: #4d3228;
+            padding: 6px 3px;
+            border: 1px solid #eccfc1;
+            font-size: 0.75rem;
+        }
+        .words-area td {
+            padding: 5px 3px;
+            border: 1px solid #eccfc1;
+            text-align: center;
+            background: #fffbf9;
+        }
+        .words-area td:first-child { font-weight: 700; color: #2d1f18; }
+        .words-area .no-words { padding: 20px 10px; text-align: center; color: #7a5f4f; font-style: italic; background: #fcf3ef; border-radius: 20px; }
+
+        .text-area { background: #ddf0e6; border: 3px solid #bcd9cb; }
+        .text-area .section-title { color: #1f5a42; }
+        .text-area .section-title::before { content: "📄 "; }
+        .text-area .text-content { font-size: 0.92rem; line-height: 1.9; color: #1d3d30; white-space: pre-wrap; word-break: break-word; padding: 4px 0; }
+        .text-area .text-content .sentence { display: block; padding: 2px 0 2px 18px; position: relative; }
+        .text-area .text-content .sentence::before { content: "•"; position: absolute; left: 2px; color: #3a8a6a; font-weight: 700; font-size: 1.1rem; }
+
+        .review-area { background: #fcf3d9; border: 3px solid #efe0c0; }
+        .review-area .section-title { color: #6a5230; }
+        .review-area .section-title::before { content: "🔄 "; }
+        .review-area .review-content { font-size: 0.9rem; line-height: 1.7; color: #3d3222; white-space: pre-wrap; }
+        .review-area .review-content a { color: #c27d4a; font-weight: 700; text-decoration: underline; cursor: pointer; background: #f5e6d0; padding: 0 6px; border-radius: 10px; }
+
+        .tasks-area { background: #fcead6; border: 3px solid #f0d0b0; display: flex; flex-direction: column; justify-content: space-between; }
+        .tasks-area .section-title { color: #7a5535; }
+        .tasks-area .section-title::before { content: "✅ "; }
+        .tasks-area ul { list-style: none; padding-left: 4px; margin: 4px 0 8px; }
+        .tasks-area li { font-size: 0.85rem; line-height: 1.6; padding: 2px 0; color: #3e2d1d; }
+        .tasks-area li::before { content: "🌟 "; font-weight: 700; }
+        .check-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 2px dashed #eacbb0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #5a4030;
+        }
+        .check-wrapper input[type="checkbox"] {
+            width: 28px;
+            height: 28px;
+            accent-color: #f5a56b;
+            transform: scale(1.1);
+            cursor: pointer;
+            border-radius: 8px;
+            border: 3px solid #dba87a;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 700px) {
+            .grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+            .words-area { grid-row: auto; }
+            .container { padding: 14px; }
+            .header h1 { font-size: 1.4rem; }
+            .header::before, .header::after { font-size: 1.4rem; }
+            .screenshot-toggle { bottom: 10px; right: 10px; padding: 8px 16px; font-size: 0.8rem; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .container { max-width: 100%; box-shadow: none; border: none; padding: 0.2cm; background: white; }
+            .nav-bar { display: none !important; }
+            .screenshot-toggle { display: none !important; }
+            .grid { gap: 8px; }
+            .section { border: 2px solid #ccc; box-shadow: none; break-inside: avoid; }
+            .words-area { background: #ffe9e0 !important; }
+            .text-area { background: #ddf0e6 !important; }
+            .review-area { background: #fcf3d9 !important; }
+            .tasks-area { background: #fcead6 !important; }
+            .header { background: #d4e8f0 !important; border: 2px solid #8fc1d4; }
+            .words-area th { background: #f5d5c4 !important; }
+            .container::before, .container::after, .words-area::before { display: none; }
+            .check-wrapper input[type="checkbox"] { accent-color: #000; }
+            .header::before, .header::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="screenshot-toggle" id="screenshotToggle">🔓 退出截图</button>
+
+    <div class="container" id="app">
+        <div style="position:absolute; top:6px; left:6px; font-size:2rem; opacity:0.10; pointer-events:none;">☁️ 🌟 ☁️</div>
+        <div style="position:absolute; bottom:6px; right:6px; font-size:2rem; opacity:0.08; pointer-events:none;">🌈 ⭐ 🌈</div>
+
+        <div class="header">
+            <h1>📚 艾宾浩斯英语打卡 <span>· Join in 三年级</span></h1>
+            <div class="day-badge" id="dayBadge">⭐ 第 1 天 ⭐</div>
+        </div>
+
+        <div class="nav-bar">
+            <div class="day-selector">
+                <button id="prevDayBtn">◀ 前一天</button>
+                <select id="daySelect"></select>
+                <button id="nextDayBtn">后一天 ▶</button>
+            </div>
+            <div class="date-indicator" id="dateIndicator">📅 第 1 天</div>
+        </div>
+
+        <div class="grid">
+            <div class="words-area section">
+                <div class="section-title">今日新词</div>
+                <div id="wordsContent"></div>
+            </div>
+            <div class="text-area section">
+                <div class="section-title">📄 对应课文</div>
+                <div class="text-content" id="textContent"></div>
+            </div>
+            <div class="review-area section">
+                <div class="section-title">🔄 今日复习</div>
+                <div class="review-content" id="reviewContent"></div>
+            </div>
+            <div class="tasks-area section">
+                <div>
+                    <div class="section-title">✅ 当日任务</div>
+                    <ul id="taskList"></ul>
+                </div>
+                <div class="check-wrapper">
+                    <span>⭐ 打卡</span>
+                    <input type="checkbox" id="dailyCheck">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 完整 30 天数据（全部填充）
+        // ================================================================
+        var daysData = [
+            // ===== 第1天 =====
+            {
+                day: 1,
+                newWords: [
+                    {sn:1,en:'let',ipa:'/let/',syl:'单音节',zh:'让'},
+                    {sn:2,en:'begin',ipa:'/bɪˈɡɪn/',syl:'be-gin',zh:'开始'},
+                    {sn:3,en:'join',ipa:'/dʒɔɪn/',syl:'单音节',zh:'加入'},
+                    {sn:4,en:'English',ipa:'/ˈɪŋɡlɪʃ/',syl:'Eng-lish',zh:'英语'},
+                    {sn:5,en:'easy',ipa:'/ˈiːzi/',syl:'ea-sy',zh:'容易的'},
+                    {sn:6,en:'come',ipa:'/kʌm/',syl:'单音节',zh:'来'},
+                    {sn:7,en:'on',ipa:'/ɒn/',syl:'单音节',zh:'在......上面'},
+                    {sn:8,en:'and',ipa:'/ænd/',syl:'单音节',zh:'和；并且'},
+                    {sn:9,en:'you',ipa:'/juː/',syl:'单音节',zh:'你；你们'},
+                    {sn:10,en:'ready',ipa:'/ˈredi/',syl:'read-y',zh:'准备好的'},
+                    {sn:11,en:'listen',ipa:'/ˈlɪsn/',syl:'lis-ten',zh:'听'},
+                    {sn:12,en:'sing',ipa:'/sɪŋ/',syl:'单音节',zh:'唱歌'},
+                    {sn:13,en:'read',ipa:'/riːd/',syl:'单音节',zh:'读'},
+                    {sn:14,en:'write',ipa:'/raɪt/',syl:'单音节',zh:'写'},
+                    {sn:15,en:'mime',ipa:'/maɪm/',syl:'单音节',zh:'比划；默剧表演'}
+                ],
+                text: "Let's begin.\nCome on, join in.\nAre you ready?\nYes, I'm ready.\nListen and sing.\nRead and write.\nClap your hands.\nJump up high.\nBend your knees.\nTouch your nose.\nDance and sing.",
+                review: "无复习内容，今日全新学习开篇单元",
+                tasks: ["全部新词逐词拼读、拆分音节，中英交替朗读 5 遍，遮挡中文默写 3 遍", "完整课文朗读 3 遍，边读同步做配套动作"]
+            },
+            // ===== 第2天 =====
+            {
+                day: 2,
+                newWords: [
+                    {sn:1,en:'hello',ipa:'/ˈheləʊ/',syl:'hel-lo',zh:'你好'},
+                    {sn:2,en:'hi',ipa:'/haɪ/',syl:'单音节',zh:'嗨'},
+                    {sn:3,en:'name',ipa:'/neɪm/',syl:'单音节',zh:'名字'},
+                    {sn:4,en:'I',ipa:'/aɪ/',syl:'单音节',zh:'我'},
+                    {sn:5,en:"I'm",ipa:'/aɪm/',syl:'单音节',zh:'我是 (I am 缩写)'},
+                    {sn:6,en:'Miss',ipa:'/mɪs/',syl:'单音节',zh:'小姐'},
+                    {sn:7,en:'goodbye',ipa:'/ˌɡʊdˈbaɪ/',syl:'good-bye',zh:'再见'},
+                    {sn:8,en:'girl',ipa:'/ɡɜːl/',syl:'单音节',zh:'女孩'},
+                    {sn:9,en:'boy',ipa:'/bɔɪ/',syl:'单音节',zh:'男孩'},
+                    {sn:10,en:'friend',ipa:'/frend/',syl:'单音节',zh:'朋友'},
+                    {sn:11,en:'what',ipa:'/wɒt/',syl:'单音节',zh:'什么'},
+                    {sn:12,en:'your',ipa:'/jɔː/',syl:'单音节',zh:'你的；你们的'},
+                    {sn:13,en:'is',ipa:'/ɪz/',syl:'单音节',zh:'是'},
+                    {sn:14,en:'nice',ipa:'/naɪs/',syl:'单音节',zh:'美好的；友好的'},
+                    {sn:15,en:'to',ipa:'/tuː/',syl:'单音节',zh:'向；到'},
+                    {sn:16,en:'meet',ipa:'/miːt/',syl:'单音节',zh:'遇见'}
+                ],
+                text: "Scene1：\nAmy: Hello, I'm Amy. What's your name?\nBob: Hi, I'm Bob. Nice to meet you, Amy.\nAmy: Nice to meet you too, Bob.\nBob: Goodbye, Amy.\nAmy: Bye, Bob.\n\nScene2：\nMiss Li: Good morning, class.\nClass: Good morning, Miss Li.\nMiss Li: What's your name?\nTom: My name is Tom.\nMary: I'm Mary.",
+                review: "完整复习第 1 天三上 Starter Unit 全部单词",
+                tasks: ["复习昨天全部单词，口头中英互译，易错单词抄写 2 行", "今日新词完整拼读，遮挡英文默写", "和家人分角色完整朗读对话 3 遍"]
+            },
+            // ===== 第3天 =====
+            {
+                day: 3,
+                newWords: [
+                    {sn:1,en:'zero',ipa:'/ˈzɪərəʊ/',syl:'ze-ro',zh:'零'},
+                    {sn:2,en:'one',ipa:'/wʌn/',syl:'单音节',zh:'一'},
+                    {sn:3,en:'two',ipa:'/tuː/',syl:'单音节',zh:'二'},
+                    {sn:4,en:'three',ipa:'/θriː/',syl:'单音节',zh:'三'},
+                    {sn:5,en:'four',ipa:'/fɔː/',syl:'单音节',zh:'四'},
+                    {sn:6,en:'five',ipa:'/faɪv/',syl:'单音节',zh:'五'},
+                    {sn:7,en:'six',ipa:'/sɪks/',syl:'单音节',zh:'六'},
+                    {sn:8,en:'seven',ipa:'/ˈsevn/',syl:'sev-en',zh:'七'},
+                    {sn:9,en:'eight',ipa:'/eɪt/',syl:'单音节',zh:'八'},
+                    {sn:10,en:'nine',ipa:'/naɪn/',syl:'单音节',zh:'九'},
+                    {sn:11,en:'ten',ipa:'/ten/',syl:'单音节',zh:'十'},
+                    {sn:12,en:'phone',ipa:'/fəʊn/',syl:'单音节',zh:'电话'},
+                    {sn:13,en:'box',ipa:'/bɒks/',syl:'单音节',zh:'盒子'},
+                    {sn:14,en:'snail',ipa:'/sneɪl/',syl:'单音节',zh:'蜗牛'},
+                    {sn:15,en:'crayon',ipa:'/ˈkreɪən/',syl:'cray-on',zh:'蜡笔'},
+                    {sn:16,en:'prize',ipa:'/praɪz/',syl:'单音节',zh:'奖品'},
+                    {sn:17,en:'guitar',ipa:'/ɡɪˈtɑː/',syl:'gui-tar',zh:'吉他'},
+                    {sn:18,en:'horse',ipa:'/hɔːs/',syl:'单音节',zh:'马'},
+                    {sn:19,en:'kite',ipa:'/kaɪt/',syl:'单音节',zh:'风筝'},
+                    {sn:20,en:'ice cream',ipa:'/ˌaɪs ˈkriːm/',syl:'ice cream',zh:'冰淇淋'},
+                    {sn:21,en:'juice',ipa:'/dʒuːs/',syl:'单音节',zh:'果汁'},
+                    {sn:22,en:'how',ipa:'/haʊ/',syl:'单音节',zh:'多少；怎样'},
+                    {sn:23,en:'many',ipa:'/ˈmeni/',syl:'man-y',zh:'许多'},
+                    {sn:24,en:'and',ipa:'/ænd/',syl:'单音节',zh:'加；和'}
+                ],
+                text: "Dialogue1：\nA: What's your phone number?\nB: My phone number is 35178942.\nA: Say it again.\nB: Three five one seven eight nine four two.\n\nDialogue2：\nA: What's in the box?\nB: Snails.\nA: How many snails?\nB: Nine snails.\n\nDialogue3：\nA: What's seven and three?\nB: Ten.\nA: Five and four?\nB: Nine.\nA: Ten and zero?\nB: Ten.",
+                review: "完整复习第 2 天三上 Unit1 Hello 全部单词",
+                tasks: ["复习问候单元单词，熟练问答自我介绍句型", "分段背诵数字 0-10，独立完整默写", "通读三段数字问答对话"]
+            },
+            // ===== 第4天 =====
+            {
+                day: 4,
+                newWords: [
+                    {sn:1,en:'red',ipa:'/red/',syl:'单音节',zh:'红色；红色的'},
+                    {sn:2,en:'blue',ipa:'/bluː/',syl:'单音节',zh:'蓝色；蓝色的'},
+                    {sn:3,en:'yellow',ipa:'/ˈjeləʊ/',syl:'yel-low',zh:'黄色；黄色的'},
+                    {sn:4,en:'green',ipa:'/ɡriːn/',syl:'单音节',zh:'绿色；绿色的'},
+                    {sn:5,en:'black',ipa:'/blæk/',syl:'单音节',zh:'黑色；黑色的'},
+                    {sn:6,en:'white',ipa:'/waɪt/',syl:'单音节',zh:'白色；白色的'},
+                    {sn:7,en:'orange',ipa:'/ˈɒrɪndʒ/',syl:'or-ange',zh:'橙色；橙子'},
+                    {sn:8,en:'pink',ipa:'/pɪŋk/',syl:'单音节',zh:'粉色；粉色的'},
+                    {sn:9,en:'purple',ipa:'/ˈpɜːpl/',syl:'pur-ple',zh:'紫色；紫色的'},
+                    {sn:10,en:'colour',ipa:'/ˈkʌlə/',syl:'col-our',zh:'颜色'},
+                    {sn:11,en:'flower',ipa:'/ˈflaʊə/',syl:'flow-er',zh:'花朵'},
+                    {sn:12,en:'ball',ipa:'/bɔːl/',syl:'单音节',zh:'球'},
+                    {sn:13,en:'what',ipa:'/wɒt/',syl:'单音节',zh:'什么'},
+                    {sn:14,en:'is',ipa:'/ɪz/',syl:'单音节',zh:'是'},
+                    {sn:15,en:'your',ipa:'/jɔː/',syl:'单音节',zh:'你的'},
+                    {sn:16,en:'it',ipa:'/ɪt/',syl:'单音节',zh:'它'},
+                    {sn:17,en:'like',ipa:'/laɪk/',syl:'单音节',zh:'喜欢'}
+                ],
+                text: "A: Look at my ball!\nB: What colour is your ball?\nA: It's orange and purple.\nB: It's beautiful! I like orange.\nA: I like purple too.\nB: What colour is your flower?\nA: It's red and yellow.",
+                review: "1. 复习第 3 天三上 Unit2 Numbers 全套单词\n2. 复习第 1 天三上 Starter Unit 单词（新学第 2 天周期巩固）",
+                tasks: ["听写数字、开篇基础单词，订正全部写错词汇", "拆分音节背诵所有颜色单词，完整默写", "朗读颜色主题对话 2 遍"]
+            },
+            // ===== 第5天 =====
+            {
+                day: 5,
+                newWords: [
+                    {sn:1,en:'join',ipa:'/dʒɔɪn/',syl:'单音节',zh:'加入'},
+                    {sn:2,en:'ready',ipa:'/ˈredi/',syl:'read-y',zh:'准备好的'},
+                    {sn:3,en:'hello',ipa:'/ˈheləʊ/',syl:'hel-lo',zh:'你好'},
+                    {sn:4,en:'friend',ipa:'/frend/',syl:'单音节',zh:'朋友'},
+                    {sn:5,en:'zero',ipa:'/ˈzɪərəʊ/',syl:'ze-ro',zh:'零'},
+                    {sn:6,en:'seven',ipa:'/ˈsevn/',syl:'sev-en',zh:'七'},
+                    {sn:7,en:'crayon',ipa:'/ˈkreɪən/',syl:'cray-on',zh:'蜡笔'},
+                    {sn:8,en:'snail',ipa:'/sneɪl/',syl:'单音节',zh:'蜗牛'},
+                    {sn:9,en:'yellow',ipa:'/ˈjeləʊ/',syl:'yel-low',zh:'黄色'},
+                    {sn:10,en:'purple',ipa:'/ˈpɜːpl/',syl:'pur-ple',zh:'紫色'},
+                    {sn:11,en:'orange',ipa:'/ˈɒrɪndʒ/',syl:'or-ange',zh:'橙色'},
+                    {sn:12,en:'flower',ipa:'/ˈflaʊə/',syl:'flow-er',zh:'花朵'},
+                    {sn:13,en:'many',ipa:'/ˈmeni/',syl:'man-y',zh:'许多'},
+                    {sn:14,en:'phone',ipa:'/fəʊn/',syl:'单音节',zh:'电话'},
+                    {sn:15,en:'colour',ipa:'/ˈkʌlə/',syl:'col-our',zh:'颜色'},
+                    {sn:16,en:'nice',ipa:'/naɪs/',syl:'单音节',zh:'美好的'},
+                    {sn:17,en:'meet',ipa:'/miːt/',syl:'单音节',zh:'遇见'},
+                    {sn:18,en:'listen',ipa:'/ˈlɪsn/',syl:'lis-ten',zh:'听'},
+                    {sn:19,en:'write',ipa:'/raɪt/',syl:'单音节',zh:'写'},
+                    {sn:20,en:'juice',ipa:'/dʒuːs/',syl:'单音节',zh:'果汁'}
+                ],
+                text: "句型汇总：\nHello, I'm ...\nWhat's your name?\nNice to meet you.\nWhat's your phone number?\nHow many ...?\nWhat colour is ...?\nIt's ...\nI like ...",
+                review: "完整复习第 4 天三上 Unit3 Colours 全部单词",
+                tasks: ["口头完整问答所有颜色相关句型", "默写前三单元易混淆词汇，标记易错词", "通读 Starter 至 Unit3 全部对话"]
+            },
+            // ===== 第6天 =====
+            {
+                day: 6,
+                newWords: [
+                    {sn:1,en:'pen',ipa:'/pen/',syl:'单音节',zh:'钢笔'},
+                    {sn:2,en:'pencil',ipa:'/ˈpensl/',syl:'pen-cil',zh:'铅笔'},
+                    {sn:3,en:'ruler',ipa:'/ˈruːlə/',syl:'rul-er',zh:'尺子'},
+                    {sn:4,en:'eraser',ipa:'/ɪˈreɪzə/',syl:'eras-er',zh:'橡皮'},
+                    {sn:5,en:'bag',ipa:'/bæɡ/',syl:'单音节',zh:'书包'},
+                    {sn:6,en:'book',ipa:'/bʊk/',syl:'单音节',zh:'书'},
+                    {sn:7,en:'desk',ipa:'/desk/',syl:'单音节',zh:'书桌'},
+                    {sn:8,en:'chair',ipa:'/tʃeə/',syl:'单音节',zh:'椅子'},
+                    {sn:9,en:'pencil-box',ipa:'/ˈpensl bɒks/',syl:'pen-cil-box',zh:'文具盒'},
+                    {sn:10,en:'where',ipa:'/weə/',syl:'单音节',zh:'哪里'},
+                    {sn:11,en:'are',ipa:'/ɑː/',syl:'单音节',zh:'是（复数）'},
+                    {sn:12,en:'my',ipa:'/maɪ/',syl:'单音节',zh:'我的'},
+                    {sn:13,en:"don't",ipa:'/dəʊnt/',syl:'单音节',zh:'不'},
+                    {sn:14,en:'know',ipa:'/nəʊ/',syl:'单音节',zh:'知道'},
+                    {sn:15,en:'remember',ipa:'/rɪˈmembə/',syl:'re-mem-ber',zh:'记得'},
+                    {sn:16,en:'in',ipa:'/ɪn/',syl:'单音节',zh:'在......里面'},
+                    {sn:17,en:'on',ipa:'/ɒn/',syl:'单音节',zh:'在......上面'},
+                    {sn:18,en:'over',ipa:'/ˈəʊvə/',syl:'ov-er',zh:'在......上方'},
+                    {sn:19,en:'there',ipa:'/ðeə/',syl:'单音节',zh:'那里'},
+                    {sn:20,en:'thanks',ipa:'/θæŋks/',syl:'单音节',zh:'谢谢'}
+                ],
+                text: "Dialogue1：\nTutu: Grandpa, where are my coloured pencils?\nGrandpa: Sorry, I don't know.\nTutu: I remember, they're in my schoolbag.\n\nDialogue2：\nTutu: Mum, where is my ruler?\nMum: It's over there, on the chair.\nTutu: Thanks, Mum.\nMum: You're welcome.",
+                review: "完整复习第 5 天三上 Revision1 汇总单词",
+                tasks: ["抽查前五单元单词中英互译，查漏补缺", "完整默写文具、方位介词单词", "分角色扮演两段寻找物品对话"]
+            },
+            // ===== 第7天 =====
+            {
+                day: 7,
+                newWords: [
+                    {sn:1,en:'birthday',ipa:'/ˈbɜːθdeɪ/',syl:'birth-day',zh:'生日'},
+                    {sn:2,en:'cake',ipa:'/keɪk/',syl:'单音节',zh:'蛋糕'},
+                    {sn:3,en:'apple',ipa:'/ˈæpl/',syl:'ap-ple',zh:'苹果'},
+                    {sn:4,en:'banana',ipa:'/bəˈnɑːnə/',syl:'ba-nan-a',zh:'香蕉'},
+                    {sn:5,en:'orange',ipa:'/ˈɒrɪndʒ/',syl:'or-ange',zh:'橙子'},
+                    {sn:6,en:'milk',ipa:'/mɪlk/',syl:'单音节',zh:'牛奶'},
+                    {sn:7,en:'juice',ipa:'/dʒuːs/',syl:'单音节',zh:'果汁'},
+                    {sn:8,en:'chocolate',ipa:'/ˈtʃɒklət/',syl:'choc-o-late',zh:'巧克力'},
+                    {sn:9,en:'ice cream',ipa:'/ˌaɪs ˈkriːm/',syl:'ice cream',zh:'冰淇淋'},
+                    {sn:10,en:'pizza',ipa:'/ˈpiːtsə/',syl:'piz-za',zh:'披萨'},
+                    {sn:11,en:'gift',ipa:'/ɡɪft/',syl:'单音节',zh:'礼物'},
+                    {sn:12,en:'happy',ipa:'/ˈhæpi/',syl:'hap-py',zh:'开心的'},
+                    {sn:13,en:'what',ipa:'/wɒt/',syl:'单音节',zh:'多么；什么'},
+                    {sn:14,en:'a',ipa:'/ə/',syl:'单音节',zh:'一个'},
+                    {sn:15,en:'lovely',ipa:'/ˈlʌvli/',syl:'love-ly',zh:'可爱的'},
+                    {sn:16,en:'have',ipa:'/hæv/',syl:'单音节',zh:'吃；喝；拥有'},
+                    {sn:17,en:'some',ipa:'/sʌm/',syl:'单音节',zh:'一些'},
+                    {sn:18,en:'thank',ipa:'/θæŋk/',syl:'单音节',zh:'感谢'}
+                ],
+                text: "All: Happy birthday, Amy!\nAmy: Thank you everyone.\nBob: What a lovely cake!\nAmy: Let's eat cake.\nTom: Have some juice, Amy.\nAmy: Thank you.\nLily: Here's a gift for you.\nAmy: Wow, toy bear! Thanks a lot.",
+                review: "1. 复习第 6 天三上 Unit4 文具全套单词\n2. 复习第 2 天三上 Unit1 单词（新学第 4 天周期巩固）",
+                tasks: ["复习文具、问候单元全部单词", "分段默写生日食物、礼物相关词汇", "完整背诵生日派对全部对话"]
+            },
+            // ===== 第8天 =====
+            {
+                day: 8,
+                newWords: [
+                    {sn:1,en:'blackboard',ipa:'/ˈblækbɔːd/',syl:'black-board',zh:'黑板'},
+                    {sn:2,en:'whiteboard',ipa:'/ˈwaɪtbɔːd/',syl:'white-board',zh:'白板'},
+                    {sn:3,en:'door',ipa:'/dɔː/',syl:'单音节',zh:'门'},
+                    {sn:4,en:'window',ipa:'/ˈwɪndəʊ/',syl:'win-dow',zh:'窗户'},
+                    {sn:5,en:'desk',ipa:'/desk/',syl:'单音节',zh:'课桌'},
+                    {sn:6,en:'chair',ipa:'/tʃeə/',syl:'单音节',zh:'椅子'},
+                    {sn:7,en:'floor',ipa:'/flɔː/',syl:'单音节',zh:'地板'},
+                    {sn:8,en:'board',ipa:'/bɔːd/',syl:'单音节',zh:'板子'},
+                    {sn:9,en:'in front of',ipa:'/ɪn frʌnt əv/',syl:'短语',zh:'在......前面'},
+                    {sn:10,en:'beside',ipa:'/bɪˈsaɪd/',syl:'be-side',zh:'在......旁边'},
+                    {sn:11,en:'behind',ipa:'/bɪˈhaɪnd/',syl:'be-hind',zh:'在......后面'},
+                    {sn:12,en:'open',ipa:'/ˈəʊpən/',syl:'o-pen',zh:'打开'},
+                    {sn:13,en:'please',ipa:'/pliːz/',syl:'单音节',zh:'请'},
+                    {sn:14,en:'all right',ipa:'/ɔːl raɪt/',syl:'短语',zh:'好的'},
+                    {sn:15,en:'how many',ipa:'/haʊ ˈmeni/',syl:'短语',zh:'多少'}
+                ],
+                text: "A: What's in your classroom?\nB: A blackboard, four windows and ten desks.\nA: How many chairs are there?\nB: Twelve chairs.\nA: Open your book, please.\nB: All right.",
+                review: "完整复习第 7 天三上 Unit5 生日单元全部单词",
+                tasks: ["口头完整背诵生日全套对话", "默写教室物品、方位短语", "朗读教室问答对话 3 遍"]
+            },
+            // ===== 第9天 =====
+            {
+                day: 9,
+                newWords: [
+                    {sn:1,en:'pencil-box',ipa:'/ˈpensl bɒks/',syl:'pen-cil-box',zh:'文具盒'},
+                    {sn:2,en:'ruler',ipa:'/ˈruːlə/',syl:'rul-er',zh:'尺子'},
+                    {sn:3,en:'remember',ipa:'/rɪˈmembə/',syl:'re-mem-ber',zh:'记得'},
+                    {sn:4,en:'birthday',ipa:'/ˈbɜːθdeɪ/',syl:'birth-day',zh:'生日'},
+                    {sn:5,en:'chocolate',ipa:'/ˈtʃɒklət/',syl:'choc-o-late',zh:'巧克力'},
+                    {sn:6,en:'gift',ipa:'/ɡɪft/',syl:'单音节',zh:'礼物'},
+                    {sn:7,en:'blackboard',ipa:'/ˈblækbɔːd/',syl:'black-board',zh:'黑板'},
+                    {sn:8,en:'window',ipa:'/ˈwɪndəʊ/',syl:'win-dow',zh:'窗户'},
+                    {sn:9,en:'behind',ipa:'/bɪˈhaɪnd/',syl:'be-hind',zh:'在......后面'},
+                    {sn:10,en:'in front of',ipa:'/ɪn frʌnt əv/',syl:'短语',zh:'在......前面'},
+                    {sn:11,en:'where',ipa:'/weə/',syl:'单音节',zh:'哪里'},
+                    {sn:12,en:'orange',ipa:'/ˈɒrɪndʒ/',syl:'or-ange',zh:'橙子；橙色'},
+                    {sn:13,en:'pizza',ipa:'/ˈpiːtsə/',syl:'piz-za',zh:'披萨'},
+                    {sn:14,en:'desk',ipa:'/desk/',syl:'单音节',zh:'书桌'},
+                    {sn:15,en:'chair',ipa:'/tʃeə/',syl:'单音节',zh:'椅子'},
+                    {sn:16,en:'thanks',ipa:'/θæŋks/',syl:'单音节',zh:'谢谢'},
+                    {sn:17,en:'some',ipa:'/sʌm/',syl:'单音节',zh:'一些'},
+                    {sn:18,en:'open',ipa:'/ˈəʊpən/',syl:'o-pen',zh:'打开'},
+                    {sn:19,en:'please',ipa:'/pliːz/',syl:'单音节',zh:'请'},
+                    {sn:20,en:'lovely',ipa:'/ˈlʌvli/',syl:'love-ly',zh:'可爱的'}
+                ],
+                text: "句型汇总：\nWhere is/are ...?\nIt's/They're in/on/behind...\nHappy birthday!\nHave some ...\nWhat a lovely cake!\nWhat's in the classroom?\nHow many ...?\nOpen your book, please.",
+                review: "完整复习第 8 天三上 Unit6 教室全套单词",
+                tasks: ["完整默写所有教室方位短语", "听写上册 4-6 单元易混淆单词", "通读三年级上册全部单元课文"]
+            },
+            // ===== 第10天 =====
+            {
+                day: 10,
+                newWords: [
+                    {sn:1,en:'morning',ipa:'/ˈmɔːnɪŋ/',syl:'mor-ning',zh:'早上'},
+                    {sn:2,en:'afternoon',ipa:'/ˌɑːftəˈnuːn/',syl:'af-ter-noon',zh:'下午'},
+                    {sn:3,en:'evening',ipa:'/ˈiːvnɪŋ/',syl:'ev-ening',zh:'傍晚'},
+                    {sn:4,en:'night',ipa:'/naɪt/',syl:'单音节',zh:'夜晚'},
+                    {sn:5,en:'welcome',ipa:'/ˈwelkəm/',syl:'wel-come',zh:'欢迎'},
+                    {sn:6,en:'back',ipa:'/bæk/',syl:'单音节',zh:'回来'},
+                    {sn:7,en:'again',ipa:'/əˈɡen/',syl:'a-gain',zh:'再一次'},
+                    {sn:8,en:'clap',ipa:'/klæp/',syl:'单音节',zh:'拍手'},
+                    {sn:9,en:'jump',ipa:'/dʒʌmp/',syl:'单音节',zh:'跳'},
+                    {sn:10,en:'bend',ipa:'/bend/',syl:'单音节',zh:'弯曲'},
+                    {sn:11,en:'touch',ipa:'/tʌtʃ/',syl:'单音节',zh:'触摸'},
+                    {sn:12,en:'dance',ipa:'/dɑːns/',syl:'单音节',zh:'跳舞'},
+                    {sn:13,en:'sing',ipa:'/sɪŋ/',syl:'单音节',zh:'唱歌'},
+                    {sn:14,en:'see',ipa:'/siː/',syl:'单音节',zh:'看见'},
+                    {sn:15,en:'you',ipa:'/juː/',syl:'单音节',zh:'你；你们'}
+                ],
+                text: "Good morning!\nGood afternoon!\nGood evening!\nGood night!\nWelcome back.\nIt's good to see you again.\nClap your hands and jump high.\nBend knees, touch toes.\nDance and sing together.",
+                review: "1. 复习第 9 天三上 Revision2 汇总单词\n2. 复习第 3 天三上 Unit2 数字单词（新学第 4 天周期巩固）",
+                tasks: ["复习上册后半册、全套数字单词", "分段背诵下册开篇单词并完整默写", "朗读问候动作歌谣 3 遍"]
+            },
+            // ===== 第11天 =====
+            {
+                day: 11,
+                newWords: [
+                    {sn:1,en:'cat',ipa:'/kæt/',syl:'单音节',zh:'猫'},
+                    {sn:2,en:'dog',ipa:'/dɒɡ/',syl:'单音节',zh:'狗'},
+                    {sn:3,en:'bird',ipa:'/bɜːd/',syl:'单音节',zh:'小鸟'},
+                    {sn:4,en:'mouse',ipa:'/maʊs/',syl:'单音节',zh:'老鼠 (单数)'},
+                    {sn:5,en:'mice',ipa:'/maɪs/',syl:'单音节',zh:'老鼠 (复数)'},
+                    {sn:6,en:'fish',ipa:'/fɪʃ/',syl:'单音节',zh:'鱼 (单复同形)'},
+                    {sn:7,en:'rabbit',ipa:'/ˈræbɪt/',syl:'rab-bit',zh:'兔子'},
+                    {sn:8,en:'frog',ipa:'/frɒɡ/',syl:'单音节',zh:'青蛙'},
+                    {sn:9,en:'hamster',ipa:'/ˈhæmstə/',syl:'ham-ster',zh:'仓鼠'},
+                    {sn:10,en:'budgie',ipa:'/ˈbʌdʒi/',syl:'bud-gie',zh:'虎皮鹦鹉'},
+                    {sn:11,en:'tiger',ipa:'/ˈtaɪɡə/',syl:'ti-ger',zh:'老虎'},
+                    {sn:12,en:'monkey',ipa:'/ˈmʌŋki/',syl:'mon-key',zh:'猴子'},
+                    {sn:13,en:'panda',ipa:'/ˈpændə/',syl:'pan-da',zh:'熊猫'},
+                    {sn:14,en:'giraffe',ipa:'/dʒəˈrɑːf/',syl:'gi-raffe',zh:'长颈鹿'},
+                    {sn:15,en:'elephant',ipa:'/ˈelɪfənt/',syl:'el-e-phant',zh:'大象'},
+                    {sn:16,en:'bear',ipa:'/beə/',syl:'单音节',zh:'熊'},
+                    {sn:17,en:'run',ipa:'/rʌn/',syl:'单音节',zh:'跑'},
+                    {sn:18,en:'sit',ipa:'/sɪt/',syl:'单音节',zh:'坐'},
+                    {sn:19,en:'fly',ipa:'/flaɪ/',syl:'单音节',zh:'飞'},
+                    {sn:20,en:'swim',ipa:'/swɪm/',syl:'单音节',zh:'游泳'},
+                    {sn:21,en:'have got',ipa:'/hæv ɡɒt/',syl:'短语',zh:'拥有'}
+                ],
+                text: "A: Have you got a pet?\nB: Yes, I have./No, I haven't.\nA: What have you got?\nB: I've got a hamster.\nA: What colour is your cat?\nB: Black and white.\nA: How many mice?\nB: Three mice.",
+                review: "完整复习第 10 天下册 Starter Unit 全套单词",
+                tasks: ["朗读复习开篇问候歌谣", "重点区分动物单复数变形，全部默写", "分角色背诵宠物问答句型"]
+            },
+            // ===== 第12天 =====
+            {
+                day: 12,
+                newWords: [
+                    {sn:1,en:'Monday',ipa:'/ˈmʌndeɪ/',syl:'Mon-day',zh:'周一'},
+                    {sn:2,en:'Tuesday',ipa:'/ˈtjuːzdeɪ/',syl:'Tues-day',zh:'周二'},
+                    {sn:3,en:'Wednesday',ipa:'/ˈwenzdeɪ/',syl:'Wednes-day',zh:'周三'},
+                    {sn:4,en:'Thursday',ipa:'/ˈθɜːzdeɪ/',syl:'Thurs-day',zh:'周四'},
+                    {sn:5,en:'Friday',ipa:'/ˈfraɪdeɪ/',syl:'Fri-day',zh:'周五'},
+                    {sn:6,en:'Saturday',ipa:'/ˈsætədeɪ/',syl:'Satur-day',zh:'周六'},
+                    {sn:7,en:'Sunday',ipa:'/ˈsʌndeɪ/',syl:'Sun-day',zh:'周日'},
+                    {sn:8,en:'today',ipa:'/təˈdeɪ/',syl:'to-day',zh:'今天'},
+                    {sn:9,en:'like',ipa:'/laɪk/',syl:'单音节',zh:'喜欢'},
+                    {sn:10,en:'play',ipa:'/pleɪ/',syl:'单音节',zh:'玩耍'},
+                    {sn:11,en:'with',ipa:'/wɪð/',syl:'单音节',zh:'和......一起'}
+                ],
+                text: "A: What day is it today?\nB: It's Friday.\nA: I like Sunday.\nOn Sunday I play with my dog.",
+                review: "完整复习第 11 天下册 Unit1 宠物全套单词",
+                tasks: ["抽查全部动物单复数单词", "按顺序背诵、完整默写七天词汇", "熟读星期问答对话"]
+            },
+            // ===== 第13天 =====
+            {
+                day: 13,
+                newWords: [
+                    {sn:1,en:'T-shirt',ipa:'/ˈtiː ʃɜːt/',syl:'T-shirt',zh:'T 恤衫'},
+                    {sn:2,en:'shirt',ipa:'/ʃɜːt/',syl:'单音节',zh:'衬衫'},
+                    {sn:3,en:'skirt',ipa:'/skɜːt/',syl:'单音节',zh:'短裙'},
+                    {sn:4,en:'dress',ipa:'/dres/',syl:'单音节',zh:'连衣裙'},
+                    {sn:5,en:'shoe',ipa:'/ʃuː/',syl:'单音节',zh:'鞋子'},
+                    {sn:6,en:'sock',ipa:'/sɒk/',syl:'单音节',zh:'袜子'},
+                    {sn:7,en:'coat',ipa:'/kəʊt/',syl:'单音节',zh:'外套'},
+                    {sn:8,en:'cap',ipa:'/kæp/',syl:'单音节',zh:'鸭舌帽'},
+                    {sn:9,en:'shorts',ipa:'/ʃɔːts/',syl:'单音节',zh:'短裤'},
+                    {sn:10,en:'wear',ipa:'/weə/',syl:'单音节',zh:'穿着'},
+                    {sn:11,en:'am',ipa:'/æm/',syl:'单音节',zh:'是'},
+                    {sn:12,en:'wearing',ipa:'/ˈweərɪŋ/',syl:'wear-ing',zh:'穿着 (进行时)'}
+                ],
+                text: "A: What are you wearing?\nB: I'm wearing a red dress and white shoes.\nA: I like your blue cap.",
+                review: "1. 复习第 12 天下册 Unit2 星期全套单词\n2. 复习第 1 天三上 Starter 单词（新学第 7 天大周期巩固）",
+                tasks: ["完整复习星期、开篇基础单词", "衣物单词拼读默写，熟练掌握 I'm wearing 句型", "角色扮演穿衣主题对话"]
+            },
+            // ===== 第14天 =====
+            {
+                day: 14,
+                newWords: [
+                    {sn:1,en:'morning',ipa:'/ˈmɔːnɪŋ/',syl:'mor-ning',zh:'早上'},
+                    {sn:2,en:'again',ipa:'/əˈɡen/',syl:'a-gain',zh:'再次'},
+                    {sn:3,en:'rabbit',ipa:'/ˈræbɪt/',syl:'rab-bit',zh:'兔子'},
+                    {sn:4,en:'mice',ipa:'/maɪs/',syl:'单音节',zh:'老鼠 (复数)'},
+                    {sn:5,en:'hamster',ipa:'/ˈhæmstə/',syl:'ham-ster',zh:'仓鼠'},
+                    {sn:6,en:'Monday',ipa:'/ˈmʌndeɪ/',syl:'Mon-day',zh:'周一'},
+                    {sn:7,en:'Sunday',ipa:'/ˈsʌndeɪ/',syl:'Sun-day',zh:'周日'},
+                    {sn:8,en:'today',ipa:'/təˈdeɪ/',syl:'to-day',zh:'今天'},
+                    {sn:9,en:'T-shirt',ipa:'/ˈtiː ʃɜːt/',syl:'T-shirt',zh:'T 恤'},
+                    {sn:10,en:'dress',ipa:'/dres/',syl:'单音节',zh:'连衣裙'},
+                    {sn:11,en:'coat',ipa:'/kəʊt/',syl:'单音节',zh:'外套'},
+                    {sn:12,en:'cap',ipa:'/kæp/',syl:'单音节',zh:'帽子'},
+                    {sn:13,en:'wear',ipa:'/weə/',syl:'单音节',zh:'穿'},
+                    {sn:14,en:'play',ipa:'/pleɪ/',syl:'单音节',zh:'玩耍'},
+                    {sn:15,en:'swim',ipa:'/swɪm/',syl:'单音节',zh:'游泳'},
+                    {sn:16,en:'fly',ipa:'/flaɪ/',syl:'单音节',zh:'飞'},
+                    {sn:17,en:'welcome',ipa:'/ˈwelkəm/',syl:'wel-come',zh:'欢迎'},
+                    {sn:18,en:'bird',ipa:'/bɜːd/',syl:'单音节',zh:'小鸟'},
+                    {sn:19,en:'tiger',ipa:'/ˈtaɪɡə/',syl:'ti-ger',zh:'老虎'},
+                    {sn:20,en:'shorts',ipa:'/ʃɔːts/',syl:'单音节',zh:'短裤'}
+                ],
+                text: "句型汇总：\nGood morning/afternoon/evening.\nWelcome back again.\nHave you got a pet?\nWhat day is it today?\nWhat are you wearing?\nI'm wearing ...",
+                review: "完整复习第 13 天下册 Unit3 衣物全套单词",
+                tasks: ["操练现在进行时穿衣问答句型", "听写下册前三单元汇总单词，订正全部错题", "通读下册 Starter 至 Unit3 全部课文"]
+            },
+            // ===== 第15天 =====
+            {
+                day: 15,
+                newWords: [
+                    {sn:1,en:'tired',ipa:'/ˈtaɪəd/',syl:'tired',zh:'疲惫的'},
+                    {sn:2,en:'sad',ipa:'/sæd/',syl:'单音节',zh:'难过的'},
+                    {sn:3,en:'angry',ipa:'/ˈæŋɡri/',syl:'an-gry',zh:'生气的'},
+                    {sn:4,en:'scared',ipa:'/skeəd/',syl:'单音节',zh:'害怕的'},
+                    {sn:5,en:'happy',ipa:'/ˈhæpi/',syl:'hap-py',zh:'开心的'},
+                    {sn:6,en:'cry',ipa:'/kraɪ/',syl:'单音节',zh:'哭'},
+                    {sn:7,en:'laugh',ipa:'/lɑːf/',syl:'单音节',zh:'大笑'},
+                    {sn:8,en:'stamp',ipa:'/stæmp/',syl:'单音节',zh:'跺脚'},
+                    {sn:9,en:'sleep',ipa:'/sliːp/',syl:'单音节',zh:'睡觉'},
+                    {sn:10,en:'feel',ipa:'/fiːl/',syl:'单音节',zh:'感觉'},
+                    {sn:11,en:'how',ipa:'/haʊ/',syl:'单音节',zh:'怎样'},
+                    {sn:12,en:'you',ipa:'/juː/',syl:'单音节',zh:'你'},
+                    {sn:13,en:'want',ipa:'/wɒnt/',syl:'单音节',zh:'想要'}
+                ],
+                text: "I'm happy. I laugh.\nI'm sad. I cry.\nI'm angry. I stamp my feet.\nA: How do you feel?\nB: I'm tired. I want to sleep.",
+                review: "1. 复习第 14 天下册 Revision1 汇总单词\n2. 复习第 5 天三上 Revision1 单词（新学第 4 天周期巩固）",
+                tasks: ["复习上下册前半部分汇总词汇", "完整默写全部情绪类形容词", "熟读感受问答对话"]
+            },
+            // ===== 第16天 =====
+            {
+                day: 16,
+                newWords: [
+                    {sn:1,en:'rice',ipa:'/raɪs/',syl:'单音节',zh:'米饭'},
+                    {sn:2,en:'noodles',ipa:'/ˈnuːdlz/',syl:'noo-dles',zh:'面条'},
+                    {sn:3,en:'egg',ipa:'/eɡ/',syl:'单音节',zh:'鸡蛋'},
+                    {sn:4,en:'tomato',ipa:'/təˈmɑːtəʊ/',syl:'to-ma-to',zh:'西红柿'},
+                    {sn:5,en:'potato',ipa:'/pəˈteɪtəʊ/',syl:'po-ta-to',zh:'土豆'},
+                    {sn:6,en:'milk',ipa:'/mɪlk/',syl:'单音节',zh:'牛奶'},
+                    {sn:7,en:'water',ipa:'/ˈwɔːtə/',syl:'wa-ter',zh:'水'},
+                    {sn:8,en:'bread',ipa:'/bred/',syl:'单音节',zh:'面包'},
+                    {sn:9,en:'soup',ipa:'/suːp/',syl:'单音节',zh:'汤'},
+                    {sn:10,en:'meat',ipa:'/miːt/',syl:'单音节',zh:'肉'},
+                    {sn:11,en:'fruit',ipa:'/fruːt/',syl:'单音节',zh:'水果'},
+                    {sn:12,en:'vegetable',ipa:'/ˈvedʒtəbl/',syl:'veg-e-ta-ble',zh:'蔬菜'},
+                    {sn:13,en:'have',ipa:'/hæv/',syl:'单音节',zh:'吃；喝'},
+                    {sn:14,en:'some',ipa:'/sʌm/',syl:'单音节',zh:'一些'}
+                ],
+                text: "A: What food do you like?\nB: I like noodles and tomatoes.\nA: Have some soup, please.",
+                review: "完整复习第 15 天下册 Unit4 情绪全套单词",
+                tasks: ["口头熟练问答 How do you feel?", "区分蔬菜、水果词汇，完整默写", "朗读食物主题对话 2 遍"]
+            },
+            // ===== 第17天 =====
+            {
+                day: 17,
+                newWords: [
+                    {sn:1,en:'head',ipa:'/hed/',syl:'单音节',zh:'头'},
+                    {sn:2,en:'hair',ipa:'/heə/',syl:'单音节',zh:'头发'},
+                    {sn:3,en:'face',ipa:'/feɪs/',syl:'单音节',zh:'脸'},
+                    {sn:4,en:'eye',ipa:'/aɪ/',syl:'单音节',zh:'眼睛 (单数)'},
+                    {sn:5,en:'eyes',ipa:'/aɪz/',syl:'单音节',zh:'眼睛 (复数)'},
+                    {sn:6,en:'ear',ipa:'/ɪə/',syl:'单音节',zh:'耳朵 (单数)'},
+                    {sn:7,en:'ears',ipa:'/ɪəz/',syl:'单音节',zh:'耳朵 (复数)'},
+                    {sn:8,en:'nose',ipa:'/nəʊz/',syl:'单音节',zh:'鼻子'},
+                    {sn:9,en:'mouth',ipa:'/maʊθ/',syl:'单音节',zh:'嘴巴'},
+                    {sn:10,en:'tooth',ipa:'/tuːθ/',syl:'单音节',zh:'牙齿 (单数)'},
+                    {sn:11,en:'teeth',ipa:'/tiːθ/',syl:'单音节',zh:'牙齿 (复数)'},
+                    {sn:12,en:'arm',ipa:'/ɑːm/',syl:'单音节',zh:'手臂'},
+                    {sn:13,en:'leg',ipa:'/leɡ/',syl:'单音节',zh:'腿'},
+                    {sn:14,en:'foot',ipa:'/fʊt/',syl:'单音节',zh:'脚 (单数)'},
+                    {sn:15,en:'feet',ipa:'/fiːt/',syl:'单音节',zh:'脚 (复数)'},
+                    {sn:16,en:'touch',ipa:'/tʌtʃ/',syl:'单音节',zh:'触摸'},
+                    {sn:17,en:'show',ipa:'/ʃəʊ/',syl:'单音节',zh:'展示'}
+                ],
+                text: "Hair, hair, touch your hair.\nFace, face, touch your face.\nEye, eye, touch your eyes.\nEar, ear, touch your ears.\nNose, nose, touch your nose.\nMouth, mouth, open your mouth.\nTooth, tooth, show your teeth.",
+                review: "完整复习第 16 天下册 Unit5 食物全套单词",
+                tasks: ["完整默写全部食物词汇", "重点背诵身体特殊复数变形单词", "边指身体部位边跟读歌谣"]
+            },
+            // ===== 第18天 =====
+            {
+                day: 18,
+                newWords: [
+                    {sn:1,en:'happy',ipa:'/ˈhæpi/',syl:'hap-py',zh:'开心的'},
+                    {sn:2,en:'tired',ipa:'/ˈtaɪəd/',syl:'tired',zh:'疲惫的'},
+                    {sn:3,en:'angry',ipa:'/ˈæŋɡri/',syl:'an-gry',zh:'生气的'},
+                    {sn:4,en:'rice',ipa:'/raɪs/',syl:'单音节',zh:'米饭'},
+                    {sn:5,en:'noodles',ipa:'/ˈnuːdlz/',syl:'noo-dles',zh:'面条'},
+                    {sn:6,en:'tomato',ipa:'/təˈmɑːtəʊ/',syl:'to-ma-to',zh:'西红柿'},
+                    {sn:7,en:'vegetable',ipa:'/ˈvedʒtəbl/',syl:'veg-e-ta-ble',zh:'蔬菜'},
+                    {sn:8,en:'head',ipa:'/hed/',syl:'单音节',zh:'头'},
+                    {sn:9,en:'hair',ipa:'/heə/',syl:'单音节',zh:'头发'},
+                    {sn:10,en:'tooth',ipa:'/tuːθ/',syl:'单音节',zh:'牙齿 (单数)'},
+                    {sn:11,en:'teeth',ipa:'/tiːθ/',syl:'单音节',zh:'牙齿 (复数)'},
+                    {sn:12,en:'foot',ipa:'/fʊt/',syl:'单音节',zh:'脚 (单数)'},
+                    {sn:13,en:'feet',ipa:'/fiːt/',syl:'单音节',zh:'脚 (复数)'},
+                    {sn:14,en:'cry',ipa:'/kraɪ/',syl:'单音节',zh:'哭'},
+                    {sn:15,en:'laugh',ipa:'/lɑːf/',syl:'单音节',zh:'大笑'},
+                    {sn:16,en:'water',ipa:'/ˈwɔːtə/',syl:'wa-ter',zh:'水'},
+                    {sn:17,en:'bread',ipa:'/bred/',syl:'单音节',zh:'面包'},
+                    {sn:18,en:'fruit',ipa:'/fruːt/',syl:'单音节',zh:'水果'},
+                    {sn:19,en:'touch',ipa:'/tʌtʃ/',syl:'单音节',zh:'触摸'},
+                    {sn:20,en:'feel',ipa:'/fiːl/',syl:'单音节',zh:'感觉'}
+                ],
+                text: "句型汇总：\nHow do you feel?\nI'm ... I laugh/cry/stamp.\nWhat food do you like?\nHave some ...\nTouch your ...\nShow your teeth.",
+                review: "完整复习第 17 天下册 Unit6 身体全套单词",
+                tasks: ["熟练背诵身体部位完整歌谣", "听写下册后半单元单词，标记变形易错词汇", "通读下册 Unit4 至 Unit6 全部课文"]
+            },
+            // ===== 第19天 =====
+            {
+                day: 19,
+                newWords: [
+                    {sn:1,en:'begin',ipa:'/bɪˈɡɪn/',syl:'be-gin',zh:'开始'},
+                    {sn:2,en:'English',ipa:'/ˈɪŋɡlɪʃ/',syl:'Eng-lish',zh:'英语'},
+                    {sn:3,en:'goodbye',ipa:'/ˌɡʊdˈbaɪ/',syl:'good-bye',zh:'再见'},
+                    {sn:4,en:'seven',ipa:'/ˈsevn/',syl:'sev-en',zh:'七'},
+                    {sn:5,en:'crayon',ipa:'/ˈkreɪən/',syl:'cray-on',zh:'蜡笔'},
+                    {sn:6,en:'yellow',ipa:'/ˈjeləʊ/',syl:'yel-low',zh:'黄色'},
+                    {sn:7,en:'purple',ipa:'/ˈpɜːpl/',syl:'pur-ple',zh:'紫色'},
+                    {sn:8,en:'eraser',ipa:'/ɪˈreɪzə/',syl:'eras-er',zh:'橡皮'},
+                    {sn:9,en:'remember',ipa:'/rɪˈmembə/',syl:'re-mem-ber',zh:'记得'},
+                    {sn:10,en:'birthday',ipa:'/ˈbɜːθdeɪ/',syl:'birth-day',zh:'生日'},
+                    {sn:11,en:'chocolate',ipa:'/ˈtʃɒklət/',syl:'choc-o-late',zh:'巧克力'},
+                    {sn:12,en:'blackboard',ipa:'/ˈblækbɔːd/',syl:'black-board',zh:'黑板'},
+                    {sn:13,en:'window',ipa:'/ˈwɪndəʊ/',syl:'win-dow',zh:'窗户'},
+                    {sn:14,en:'behind',ipa:'/bɪˈhaɪnd/',syl:'be-hind',zh:'在......后面'},
+                    {sn:15,en:'orange',ipa:'/ˈɒrɪndʒ/',syl:'or-ange',zh:'橙子；橙色'},
+                    {sn:16,en:'pencil-box',ipa:'/ˈpensl bɒks/',syl:'pen-cil-box',zh:'文具盒'},
+                    {sn:17,en:'lovely',ipa:'/ˈlʌvli/',syl:'love-ly',zh:'可爱的'},
+                    {sn:18,en:'colour',ipa:'/ˈkʌlə/',syl:'col-our',zh:'颜色'},
+                    {sn:19,en:'listen',ipa:'/ˈlɪsn/',syl:'lis-ten',zh:'听'},
+                    {sn:20,en:'ice cream',ipa:'/ˌaɪs ˈkriːm/',syl:'ice cream',zh:'冰淇淋'}
+                ],
+                text: "随机抽查三年级上册所有单元对话，自主朗读任意段落",
+                review: "1. 复习第 18 天下册 Revision2 汇总单词\n2. 复习第 7 天三上 Unit5 生日单词（新学第 4 天周期巩固）",
+                tasks: ["复习下册后半单元、生日全套单词", "拆分音节反复默写上册长难易错单词", "随机抽取上册课文脱稿朗读"]
+            },
+            // ===== 第20天 =====
+            {
+                day: 20,
+                newWords: [
+                    {sn:1,en:'afternoon',ipa:'/ˌɑːftəˈnuːn/',syl:'af-ter-noon',zh:'下午'},
+                    {sn:2,en:'again',ipa:'/əˈɡen/',syl:'a-gain',zh:'再次'},
+                    {sn:3,en:'hamster',ipa:'/ˈhæmstə/',syl:'ham-ster',zh:'仓鼠'},
+                    {sn:4,en:'mice',ipa:'/maɪs/',syl:'单音节',zh:'老鼠 (复数)'},
+                    {sn:5,en:'giraffe',ipa:'/dʒəˈrɑːf/',syl:'gi-raffe',zh:'长颈鹿'},
+                    {sn:6,en:'Wednesday',ipa:'/ˈwenzdeɪ/',syl:'Wednes-day',zh:'周三'},
+                    {sn:7,en:'Thursday',ipa:'/ˈθɜːzdeɪ/',syl:'Thurs-day',zh:'周四'},
+                    {sn:8,en:'dress',ipa:'/dres/',syl:'单音节',zh:'连衣裙'},
+                    {sn:9,en:'vegetable',ipa:'/ˈvedʒtəbl/',syl:'veg-e-ta-ble',zh:'蔬菜'},
+                    {sn:10,en:'tomato',ipa:'/təˈmɑːtəʊ/',syl:'to-ma-to',zh:'西红柿'},
+                    {sn:11,en:'potato',ipa:'/pəˈteɪtəʊ/',syl:'po-ta-to',zh:'土豆'},
+                    {sn:12,en:'tired',ipa:'/ˈtaɪəd/',syl:'tired',zh:'疲惫的'},
+                    {sn:13,en:'angry',ipa:'/ˈæŋɡri/',syl:'an-gry',zh:'生气的'},
+                    {sn:14,en:'teeth',ipa:'/tiːθ/',syl:'单音节',zh:'牙齿 (复数)'},
+                    {sn:15,en:'feet',ipa:'/fiːt/',syl:'单音节',zh:'脚 (复数)'},
+                    {sn:16,en:'rabbit',ipa:'/ˈræbɪt/',syl:'rab-bit',zh:'兔子'},
+                    {sn:17,en:'elephant',ipa:'/ˈelɪfənt/',syl:'el-e-phant',zh:'大象'},
+                    {sn:18,en:'welcome',ipa:'/ˈwelkəm/',syl:'wel-come',zh:'欢迎'},
+                    {sn:19,en:'scared',ipa:'/skeəd/',syl:'单音节',zh:'害怕的'},
+                    {sn:20,en:'noodles',ipa:'/ˈnuːdlz/',syl:'noo-dles',zh:'面条'}
+                ],
+                text: "完整通读三年级上下册全部歌谣、对话，无遗漏段落",
+                review: "完整复习第 19 天三上全册易错单词",
+                tasks: ["完整听写上册全部易错单词，订正所有错误", "集中默写下册变形难点词汇", "完成第一轮新词全部学习，通读全套课文"]
+            },
+            // ===== 第21天（复习） =====
+            {
+                day: 21,
+                newWords: [
+                    {sn:1,en:'red',ipa:'/red/',syl:'单音节',zh:'红色；红色的'},
+                    {sn:2,en:'blue',ipa:'/bluː/',syl:'单音节',zh:'蓝色；蓝色的'},
+                    {sn:3,en:'yellow',ipa:'/ˈjeləʊ/',syl:'yel-low',zh:'黄色；黄色的'},
+                    {sn:4,en:'green',ipa:'/ɡriːn/',syl:'单音节',zh:'绿色；绿色的'},
+                    {sn:5,en:'black',ipa:'/blæk/',syl:'单音节',zh:'黑色；黑色的'},
+                    {sn:6,en:'white',ipa:'/waɪt/',syl:'单音节',zh:'白色；白色的'},
+                    {sn:7,en:'orange',ipa:'/ˈɒrɪndʒ/',syl:'or-ange',zh:'橙色；橙子'},
+                    {sn:8,en:'pink',ipa:'/pɪŋk/',syl:'单音节',zh:'粉色；粉色的'},
+                    {sn:9,en:'purple',ipa:'/ˈpɜːpl/',syl:'pur-ple',zh:'紫色；紫色的'},
+                    {sn:10,en:'colour',ipa:'/ˈkʌlə/',syl:'col-our',zh:'颜色'},
+                    {sn:11,en:'flower',ipa:'/ˈflaʊə/',syl:'flow-er',zh:'花朵'},
+                    {sn:12,en:'ball',ipa:'/bɔːl/',syl:'单音节',zh:'球'},
+                    {sn:13,en:'like',ipa:'/laɪk/',syl:'单音节',zh:'喜欢'},
+                    {sn:14,en:'morning',ipa:'/ˈmɔːnɪŋ/',syl:'mor-ning',zh:'早上'},
+                    {sn:15,en:'afternoon',ipa:'/ˌɑːftəˈnuːn/',syl:'af-ter-noon',zh:'下午'},
+                    {sn:16,en:'evening',ipa:'/ˈiːvnɪŋ/',syl:'ev-ening',zh:'傍晚'},
+                    {sn:17,en:'night',ipa:'/naɪt/',syl:'单音节',zh:'夜晚'},
+                    {sn:18,en:'welcome',ipa:'/ˈwelkəm/',syl:'wel-come',zh:'欢迎'},
+                    {sn:19,en:'back',ipa:'/bæk/',syl:'单音节',zh:'回来'},
+                    {sn:20,en:'again',ipa:'/əˈɡen/',syl:'a-gain',zh:'再次'},
+                    {sn:21,en:'clap',ipa:'/klæp/',syl:'单音节',zh:'拍手'},
+                    {sn:22,en:'jump',ipa:'/dʒʌmp/',syl:'单音节',zh:'跳'},
+                    {sn:23,en:'bend',ipa:'/bend/',syl:'单音节',zh:'弯曲'},
+                    {sn:24,en:'touch',ipa:'/tʌtʃ/',syl:'单音节',zh:'触摸'},
+                    {sn:25,en:'dance',ipa:'/dɑːns/',syl:'单音节',zh:'跳舞'},
+                    {sn:26,en:'sing',ipa:'/sɪŋ/',syl:'单音节',zh:'唱歌'},
+                    {sn:27,en:'see',ipa:'/siː/',syl:'单音节',zh:'看见'},
+                    {sn:28,en:'cat',ipa:'/kæt/',syl:'单音节',zh:'猫'},
+                    {sn:29,en:'dog',ipa:'/dɒɡ/',syl:'单音节',zh:'狗'},
+                    {sn:30,en:'bird',ipa:'/bɜːd/',syl:'单音节',zh:'小鸟'},
+                    {sn:31,en:'mouse',ipa:'/maʊs/',syl:'单音节',zh:'老鼠(单数)'},
+                    {sn:32,en:'mice',ipa:'/maɪs/',syl:'单音节',zh:'老鼠(复数)'},
+                    {sn:33,en:'fish',ipa:'/fɪʃ/',syl:'单音节',zh:'鱼(单复同形)'},
+                    {sn:34,en:'rabbit',ipa:'/ˈræbɪt/',syl:'rab-bit',zh:'兔子'},
+                    {sn:35,en:'frog',ipa:'/frɒɡ/',syl:'单音节',zh:'青蛙'},
+                    {sn:36,en:'hamster',ipa:'/ˈhæmstə/',syl:'ham-ster',zh:'仓鼠'},
+                    {sn:37,en:'budgie',ipa:'/ˈbʌdʒi/',syl:'bud-gie',zh:'虎皮鹦鹉'},
+                    {sn:38,en:'tiger',ipa:'/ˈtaɪɡə/',syl:'ti-ger',zh:'老虎'},
+                    {sn:39,en:'monkey',ipa:'/ˈmʌŋki/',syl:'mon-key',zh:'猴子'},
+                    {sn:40,en:'panda',ipa:'/ˈpændə/',syl:'pan-da',zh:'熊猫'},
+                    {sn:41,en:'giraffe',ipa:'/dʒəˈrɑːf/',syl:'gi-raffe',zh:'长颈鹿'},
+                    {sn:42,en:'elephant',ipa:'/ˈelɪfənt/',syl:'el-e-phant',zh:'大象'},
+                    {sn:43,en:'bear',ipa:'/beə/',syl:'单音节',zh:'熊'},
+                    {sn:44,en:'run',ipa:'/rʌn/',syl:'单音节',zh:'跑'},
+                    {sn:45,en:'sit',ipa:'/sɪt/',syl:'单音节',zh:'坐'},
+                    {sn:46,en:'fly',ipa:'/flaɪ/',syl:'单音节',zh:'飞'},
+                    {sn:47,en:'swim',ipa:'/swɪm/',syl:'单音节',zh:'游泳'},
+                    {sn:48,en:'have got',ipa:'/hæv ɡɒt/',syl:'短语',zh:'拥有'}
+                ],
+                text: "颜色问答：\nWhat colour is your ball?\nIt's orange and purple.\nI like orange.\n\n宠物问答：\nHave you got a pet?\nYes, I have.\nWhat have you got?\nI've got a hamster.\nHow many mice?\nThree mice.",
+                review: "1. 三上Unit3 Colours 全套颜色单词\n2. 三下Starter Unit 全套问候动作单词\n3. 三下Unit1 Animals 全套动物单词（含单复数变形）",
+                tasks: ["三组复习单词完整听写，先看中文说英文，再看英文说中文", "重点区分mouse/mice、foot/feet、tooth/teeth等复数变形", "对应三篇课文各完整朗读一遍，做到不卡词"]
+            },
+            // ===== 第22天（复习） =====
+            {
+                day: 22,
+                newWords: [
+                    {sn:1,en:'pen',ipa:'/pen/',syl:'单音节',zh:'钢笔'},
+                    {sn:2,en:'pencil',ipa:'/ˈpensl/',syl:'pen-cil',zh:'铅笔'},
+                    {sn:3,en:'ruler',ipa:'/ˈruːlə/',syl:'rul-er',zh:'尺子'},
+                    {sn:4,en:'eraser',ipa:'/ɪˈreɪzə/',syl:'eras-er',zh:'橡皮'},
+                    {sn:5,en:'bag',ipa:'/bæɡ/',syl:'单音节',zh:'书包'},
+                    {sn:6,en:'book',ipa:'/bʊk/',syl:'单音节',zh:'书'},
+                    {sn:7,en:'desk',ipa:'/desk/',syl:'单音节',zh:'书桌'},
+                    {sn:8,en:'chair',ipa:'/tʃeə/',syl:'单音节',zh:'椅子'},
+                    {sn:9,en:'pencil-box',ipa:'/ˈpensl bɒks/',syl:'pen-cil-box',zh:'文具盒'},
+                    {sn:10,en:'where',ipa:'/weə/',syl:'单音节',zh:'哪里'},
+                    {sn:11,en:'my',ipa:'/maɪ/',syl:'单音节',zh:'我的'},
+                    {sn:12,en:'remember',ipa:'/rɪˈmembə/',syl:'re-mem-ber',zh:'记得'},
+                    {sn:13,en:'in',ipa:'/ɪn/',syl:'单音节',zh:'在......里面'},
+                    {sn:14,en:'on',ipa:'/ɒn/',syl:'单音节',zh:'在......上面'},
+                    {sn:15,en:'over',ipa:'/ˈəʊvə/',syl:'ov-er',zh:'在......上方'},
+                    {sn:16,en:'there',ipa:'/ðeə/',syl:'单音节',zh:'那里'},
+                    {sn:17,en:'thanks',ipa:'/θæŋks/',syl:'单音节',zh:'谢谢'},
+                    {sn:18,en:'Monday',ipa:'/ˈmʌndeɪ/',syl:'Mon-day',zh:'周一'},
+                    {sn:19,en:'Tuesday',ipa:'/ˈtjuːzdeɪ/',syl:'Tues-day',zh:'周二'},
+                    {sn:20,en:'Wednesday',ipa:'/ˈwenzdeɪ/',syl:'Wednes-day',zh:'周三'},
+                    {sn:21,en:'Thursday',ipa:'/ˈθɜːzdeɪ/',syl:'Thurs-day',zh:'周四'},
+                    {sn:22,en:'Friday',ipa:'/ˈfraɪdeɪ/',syl:'Fri-day',zh:'周五'},
+                    {sn:23,en:'Saturday',ipa:'/ˈsætədeɪ/',syl:'Satur-day',zh:'周六'},
+                    {sn:24,en:'Sunday',ipa:'/ˈsʌndeɪ/',syl:'Sun-day',zh:'周日'},
+                    {sn:25,en:'today',ipa:'/təˈdeɪ/',syl:'to-day',zh:'今天'},
+                    {sn:26,en:'like',ipa:'/laɪk/',syl:'单音节',zh:'喜欢'},
+                    {sn:27,en:'play',ipa:'/pleɪ/',syl:'单音节',zh:'玩耍'},
+                    {sn:28,en:'with',ipa:'/wɪð/',syl:'单音节',zh:'和......一起'},
+                    {sn:29,en:'T-shirt',ipa:'/ˈtiː ʃɜːt/',syl:'T-shirt',zh:'T恤衫'},
+                    {sn:30,en:'shirt',ipa:'/ʃɜːt/',syl:'单音节',zh:'衬衫'},
+                    {sn:31,en:'skirt',ipa:'/skɜːt/',syl:'单音节',zh:'短裙'},
+                    {sn:32,en:'dress',ipa:'/dres/',syl:'单音节',zh:'连衣裙'},
+                    {sn:33,en:'shoe',ipa:'/ʃuː/',syl:'单音节',zh:'鞋子'},
+                    {sn:34,en:'sock',ipa:'/sɒk/',syl:'单音节',zh:'袜子'},
+                    {sn:35,en:'coat',ipa:'/kəʊt/',syl:'单音节',zh:'外套'},
+                    {sn:36,en:'cap',ipa:'/kæp/',syl:'单音节',zh:'鸭舌帽'},
+                    {sn:37,en:'shorts',ipa:'/ʃɔːts/',syl:'单音节',zh:'短裤'},
+                    {sn:38,en:'wear',ipa:'/weə/',syl:'单音节',zh:'穿着'},
+                    {sn:39,en:'am',ipa:'/æm/',syl:'单音节',zh:'是'},
+                    {sn:40,en:'wearing',ipa:'/ˈweərɪŋ/',syl:'wear-ing',zh:'穿着(进行时)'}
+                ],
+                text: "找文具：\nWhere are my coloured pencils?\nThey're in my schoolbag.\nWhere is my ruler?\nIt's over there, on the chair.\n\n星期：\nWhat day is it today?\nIt's Friday.\nI like Sunday.\nOn Sunday I play with my dog.\n\n衣物：\nWhat are you wearing?\nI'm wearing a red dress and white shoes.",
+                review: "1. 三上Unit4 School Things 全套文具方位单词\n2. 三下Unit2 Days of the week 全套星期单词\n3. 三下Unit3 Clothes 全套衣物单词",
+                tasks: ["遮挡中文默写全部英文单词，标记写错词汇", "每个错误单词抄写3遍，再独立听写1遍", "操练句型：Where is...? What day is it? What are you wearing?"]
+            },
+            // ===== 第23天（复习） =====
+            {
+                day: 23,
+                newWords: [
+                    {sn:1,en:'blackboard',ipa:'/ˈblækbɔːd/',syl:'black-board',zh:'黑板'},
+                    {sn:2,en:'whiteboard',ipa:'/ˈwaɪtbɔːd/',syl:'white-board',zh:'白板'},
+                    {sn:3,en:'door',ipa:'/dɔː/',syl:'单音节',zh:'门'},
+                    {sn:4,en:'window',ipa:'/ˈwɪndəʊ/',syl:'win-dow',zh:'窗户'},
+                    {sn:5,en:'desk',ipa:'/desk/',syl:'单音节',zh:'课桌'},
+                    {sn:6,en:'chair',ipa:'/tʃeə/',syl:'单音节',zh:'椅子'},
+                    {sn:7,en:'floor',ipa:'/flɔː/',syl:'单音节',zh:'地板'},
+                    {sn:8,en:'board',ipa:'/bɔːd/',syl:'单音节',zh:'板子'},
+                    {sn:9,en:'in front of',ipa:'/ɪn frʌnt əv/',syl:'短语',zh:'在......前面'},
+                    {sn:10,en:'beside',ipa:'/bɪˈsaɪd/',syl:'be-side',zh:'在......旁边'},
+                    {sn:11,en:'behind',ipa:'/bɪˈhaɪnd/',syl:'be-hind',zh:'在......后面'},
+                    {sn:12,en:'open',ipa:'/ˈəʊpən/',syl:'o-pen',zh:'打开'},
+                    {sn:13,en:'please',ipa:'/pliːz/',syl:'单音节',zh:'请'},
+                    {sn:14,en:'all right',ipa:'/ɔːl raɪt/',syl:'短语',zh:'好的'},
+                    {sn:15,en:'how many',ipa:'/haʊ ˈmeni/',syl:'短语',zh:'多少'},
+                    {sn:16,en:'morning',ipa:'/ˈmɔːnɪŋ/',syl:'mor-ning',zh:'早上'},
+                    {sn:17,en:'again',ipa:'/əˈɡen/',syl:'a-gain',zh:'再次'},
+                    {sn:18,en:'rabbit',ipa:'/ˈræbɪt/',syl:'rab-bit',zh:'兔子'},
+                    {sn:19,en:'mice',ipa:'/maɪs/',syl:'单音节',zh:'老鼠(复数)'},
+                    {sn:20,en:'hamster',ipa:'/ˈhæmstə/',syl:'ham-ster',zh:'仓鼠'},
+                    {sn:21,en:'Monday',ipa:'/ˈmʌndeɪ/',syl:'Mon-day',zh:'周一'},
+                    {sn:22,en:'Sunday',ipa:'/ˈsʌndeɪ/',syl:'Sun-day',zh:'周日'},
+                    {sn:23,en:'today',ipa:'/təˈdeɪ/',syl:'to-day',zh:'今天'},
+                    {sn:24,en:'T-shirt',ipa:'/ˈtiː ʃɜːt/',syl:'T-shirt',zh:'T恤'},
+                    {sn:25,en:'dress',ipa:'/dres/',syl:'单音节',zh:'连衣裙'},
+                    {sn:26,en:'coat',ipa:'/kəʊt/',syl:'单音节',zh:'外套'},
+                    {sn:27,en:'cap',ipa:'/kæp/',syl:'单音节',zh:'帽子'},
+                    {sn:28,en:'wear',ipa:'/weə/',syl:'单音节',zh:'穿'},
+                    {sn:29,en:'play',ipa:'/pleɪ/',syl:'单音节',zh:'玩耍'},
+                    {sn:30,en:'swim',ipa:'/swɪm/',syl:'单音节',zh:'游泳'}
+                ],
+                text: "教室物品问答：\nLook at the blackboard.\nOpen the window, please.\nClose the door.\n\n方位句型：\nWhere's the book?\nIt's on the desk.\nIt's in front of the chair.\nIt's beside the window.\nIt's behind the door.\n\n日常应答：\nPlease!\nAll right!\n\n数量提问：\nHow many chairs?\nOne chair.",
+                review: "1. 三上Unit5 Classroom 全套教室物品、方位介词单词及短语\n2. 前期动物、星期、衣物高频单词复盘\n3. 基础日常交际句型复盘",
+                tasks: ["熟记所有教室物品及方位介词，能看图快速说出英文", "熟练运用Where's...? 方位句型造句、问答", "通读复盘所有旧单词，筛选遗忘词汇重点标记"]
+            },
+            // ===== 第24天（数字1-20） =====
+            {
+                day: 24,
+                newWords: [
+                    {sn:1,en:'one',ipa:'/wʌn/',syl:'单音节',zh:'一'},
+                    {sn:2,en:'two',ipa:'/tuː/',syl:'单音节',zh:'二'},
+                    {sn:3,en:'three',ipa:'/θriː/',syl:'单音节',zh:'三'},
+                    {sn:4,en:'four',ipa:'/fɔː/',syl:'单音节',zh:'四'},
+                    {sn:5,en:'five',ipa:'/faɪv/',syl:'单音节',zh:'五'},
+                    {sn:6,en:'six',ipa:'/sɪks/',syl:'单音节',zh:'六'},
+                    {sn:7,en:'seven',ipa:'/ˈsevən/',syl:'sev-en',zh:'七'},
+                    {sn:8,en:'eight',ipa:'/eɪt/',syl:'单音节',zh:'八'},
+                    {sn:9,en:'nine',ipa:'/naɪn/',syl:'单音节',zh:'九'},
+                    {sn:10,en:'ten',ipa:'/ten/',syl:'单音节',zh:'十'},
+                    {sn:11,en:'eleven',ipa:'/ɪˈlevn/',syl:'el-ev-en',zh:'十一'},
+                    {sn:12,en:'twelve',ipa:'/twelv/',syl:'单音节',zh:'十二'},
+                    {sn:13,en:'thirteen',ipa:'/ˌθɜːˈtiːn/',syl:'thir-teen',zh:'十三'},
+                    {sn:14,en:'fourteen',ipa:'/ˌfɔːˈtiːn/',syl:'four-teen',zh:'十四'},
+                    {sn:15,en:'fifteen',ipa:'/ˌfɪfˈtiːn/',syl:'fif-teen',zh:'十五'},
+                    {sn:16,en:'sixteen',ipa:'/ˌsɪksˈtiːn/',syl:'six-teen',zh:'十六'},
+                    {sn:17,en:'seventeen',ipa:'/ˌsevənˈtiːn/',syl:'sev-en-teen',zh:'十七'},
+                    {sn:18,en:'eighteen',ipa:'/ˌeɪˈtiːn/',syl:'eight-teen',zh:'十八'},
+                    {sn:19,en:'nineteen',ipa:'/ˌnaɪnˈtiːn/',syl:'nine-teen',zh:'十九'},
+                    {sn:20,en:'twenty',ipa:'/ˈtwenti/',syl:'twen-ty',zh:'二十'}
+                ],
+                text: "数字问答：\nHow many birds?\nOne bird.\nHow many mice?\nThree mice.\n\n数字运用：\nI'm ten.\nI have five pens.",
+                review: "1. 三上Unit6 Numbers 1-20 全套数字单词\n2. 数字计数核心句型复盘\n3. 前期易错单复数单词二次复盘",
+                tasks: ["熟练认读、拼写1-20所有数字单词，做到零出错", "随机抽查数字听写，重点掌握11-20易混单词", "熟练运用How many...? 句型问答计数"]
+            },
+            // ===== 第25天（情绪） =====
+            {
+                day: 25,
+                newWords: [
+                    {sn:1,en:'happy',ipa:'/ˈhæpi/',syl:'hap-py',zh:'开心的'},
+                    {sn:2,en:'sad',ipa:'/sæd/',syl:'单音节',zh:'难过的'},
+                    {sn:3,en:'angry',ipa:'/ˈæŋɡri/',syl:'an-gry',zh:'生气的'},
+                    {sn:4,en:'tired',ipa:'/ˈtaɪəd/',syl:'tired',zh:'疲惫的'},
+                    {sn:5,en:'scared',ipa:'/skeəd/',syl:'单音节',zh:'害怕的'},
+                    {sn:6,en:'bored',ipa:'/bɔːd/',syl:'单音节',zh:'无聊的'},
+                    {sn:7,en:'feel',ipa:'/fiːl/',syl:'单音节',zh:'感觉'},
+                    {sn:8,en:'very',ipa:'/ˈveri/',syl:'ver-y',zh:'非常'},
+                    {sn:9,en:'so',ipa:'/səʊ/',syl:'单音节',zh:'如此，这么'},
+                    {sn:10,en:'too',ipa:'/tuː/',syl:'单音节',zh:'也，太'}
+                ],
+                text: "情绪问答：\nHow do you feel?\nI'm happy.\nI'm sad.\nI'm angry.\nI'm tired.\n\n句型拓展：\nI'm very happy.\nI'm so tired.",
+                review: "1. 三下Unit4 Feelings 全套情绪类单词\n2. 情绪问答核心句型复盘\n3. 1-20数字单词二次巩固复盘",
+                tasks: ["背诵所有情绪单词，能看图快速说出对应英文", "两两操练情绪问答句型，熟练脱口而出", "默写1-20数字单词，查漏补缺"]
+            },
+            // ===== 第26天（季节） =====
+            {
+                day: 26,
+                newWords: [
+                    {sn:1,en:'spring',ipa:'/sprɪŋ/',syl:'单音节',zh:'春天'},
+                    {sn:2,en:'summer',ipa:'/ˈsʌmə/',syl:'sum-mer',zh:'夏天'},
+                    {sn:3,en:'autumn',ipa:'/ˈɔːtəm/',syl:'au-tumn',zh:'秋天'},
+                    {sn:4,en:'winter',ipa:'/ˈwɪntə/',syl:'win-ter',zh:'冬天'},
+                    {sn:5,en:'warm',ipa:'/wɔːm/',syl:'单音节',zh:'温暖的'},
+                    {sn:6,en:'hot',ipa:'/hɒt/',syl:'单音节',zh:'炎热的'},
+                    {sn:7,en:'cool',ipa:'/kuːl/',syl:'单音节',zh:'凉爽的'},
+                    {sn:8,en:'cold',ipa:'/kəʊld/',syl:'单音节',zh:'寒冷的'},
+                    {sn:9,en:'season',ipa:'/ˈsiːzn/',syl:'sea-son',zh:'季节'},
+                    {sn:10,en:'weather',ipa:'/ˈweðə/',syl:'weath-er',zh:'天气'}
+                ],
+                text: "季节天气问答：\nWhat season is it?\nIt's spring.\nIt's warm.\nSummer is hot.\nAutumn is cool.\nWinter is cold.",
+                review: "1. 三下Unit5 Seasons 全套季节、天气单词\n2. 季节天气问答句型复盘\n3. 情绪类单词及句型二次复盘",
+                tasks: ["熟记四季及天气形容词，精准匹配对应季节特征", "完整背诵季节问答对话，流利朗读无卡顿", "默写所有季节天气单词，纠正拼写错误"]
+            },
+            // ===== 第27天（动作能力） =====
+            {
+                day: 27,
+                newWords: [
+                    {sn:1,en:'jump',ipa:'/dʒʌmp/',syl:'单音节',zh:'跳'},
+                    {sn:2,en:'run',ipa:'/rʌn/',syl:'单音节',zh:'跑'},
+                    {sn:3,en:'fly',ipa:'/flaɪ/',syl:'单音节',zh:'飞'},
+                    {sn:4,en:'swim',ipa:'/swɪm/',syl:'单音节',zh:'游泳'},
+                    {sn:5,en:'walk',ipa:'/wɔːk/',syl:'单音节',zh:'走路'},
+                    {sn:6,en:'talk',ipa:'/tɔːk/',syl:'单音节',zh:'说话'},
+                    {sn:7,en:'look',ipa:'/lʊk/',syl:'单音节',zh:'看'},
+                    {sn:8,en:'listen',ipa:'/ˈlɪsn/',syl:'lis-ten',zh:'听，倾听'},
+                    {sn:9,en:'sing',ipa:'/sɪŋ/',syl:'单音节',zh:'唱歌'},
+                    {sn:10,en:'dance',ipa:'/dɑːns/',syl:'单音节',zh:'跳舞'}
+                ],
+                text: "动作句型问答：\nWhat can you do?\nI can jump.\nI can run.\nI can fly.\nI can swim.\nI can walk.\n\n拓展句型：\nI can sing and dance.\nListen to me.\nLook at me.",
+                review: "1. 三下Unit6 Abilities 全套动作、能力类单词\n2. can能力问答核心句型复盘\n3. 四季天气、情绪类单词及句型综合复盘",
+                tasks: ["熟记所有动作单词，做到听读、默写零失误", "熟练运用What can you do? 句型自由问答、造句", "整合近期所有复盘单词，整理个人易错词汇本"]
+            },
+            // ===== 第28天（综合复盘） =====
+            {
+                day: 28,
+                newWords: [
+                    {sn:1,en:'数字类',ipa:'',syl:'',zh:'one-twenty 1-20数字'},
+                    {sn:2,en:'情绪类',ipa:'',syl:'',zh:'happy, sad, angry, tired, scared, bored'},
+                    {sn:3,en:'季节天气类',ipa:'',syl:'',zh:'spring, summer, autumn, winter, warm, hot, cool, cold'},
+                    {sn:4,en:'动作能力类',ipa:'',syl:'',zh:'jump, run, fly, swim, walk, sing, dance, look, listen'},
+                    {sn:5,en:'教室物品类',ipa:'',syl:'',zh:'blackboard, window, door, desk, chair'},
+                    {sn:6,en:'方位介词类',ipa:'',syl:'',zh:'on, in, under, beside, behind, in front of'}
+                ],
+                text: "核心句型综合复盘：\n1. 数字句型：How many...? 多少......？\n2. 方位句型：Where's...? It's... ......在哪里？它在......\n3. 情绪句型：How do you feel? I'm... 你感觉如何？我......\n4. 季节句型：What season is it? It's... It's... 是什么季节？是......天气......\n5. 能力句型：What can you do? I can... 你会做什么？我会......",
+                review: "1. 30天打卡所有核心单词全科复盘\n2. 五大类高频必考句型整合背诵\n3. 筛选全程易错单词、句型重点攻克",
+                tasks: ["通读所有分类单词，查漏补缺，标记遗忘词汇", "熟练背诵5大核心句型，做到随机提问脱口而出", "自主造句练习，每类句型造3个完整句子"]
+            },
+            // ===== 第29天（易错专项） =====
+            {
+                day: 29,
+                newWords: [
+                    {sn:1,en:'thirteen',ipa:'/ˌθɜːˈtiːn/',syl:'',zh:'十三 (注意咬舌音，区分thirty)'},
+                    {sn:2,en:'fourteen',ipa:'/ˌfɔːˈtiːn/',syl:'',zh:'十四 (拼写不要漏字母u，区分forty)'},
+                    {sn:3,en:'autumn',ipa:'/ˈɔːtəm/',syl:'',zh:'秋天 (多音节，注意重音位置)'},
+                    {sn:4,en:'angry',ipa:'/ˈæŋɡri/',syl:'',zh:'生气的 (注意结尾字母拼写)'},
+                    {sn:5,en:'listen',ipa:'/ˈlɪsn/',syl:'',zh:'听 (字母t不发音)'},
+                    {sn:6,en:'behind',ipa:'/bɪˈhaɪnd/',syl:'',zh:'在......后面 (长单词，注意音节拆分)'}
+                ],
+                text: "易错句型专项纠错：\n1. 易错：How many book? ✅正确：How many books?（many后接可数名词复数）\n2. 易错：I can swimming. ✅正确：I can swim.（can后接动词原形）\n3. 易错：Where is the pens? ✅正确：Where are the pens?（单复数匹配be动词）\n4. 易错：I very happy. ✅正确：I'm very happy.（句子必须带be动词）",
+                review: "1. 全程高频易错单词集中攻克\n2. 句型语法易错点专项纠错记忆\n3. 针对性默写易错词汇、句型",
+                tasks: ["专项默写所有易错单词，纠正拼写、读音错误", "背诵易错句型，牢记语法规则，规避失分点", "整理个人专属易错错题本，巩固记忆"]
+            },
+            // ===== 第30天（终极总复盘） =====
+            {
+                day: 30,
+                newWords: [],
+                text: "本次汇总涵盖21-30天所有复盘单词，包含数字、情绪、季节天气、动作能力、教室物品、方位介词六大核心板块，全覆盖三年级Join in上册、下册核心必考词汇，所有单词要求做到：会读、会拼、会译、会用。",
+                review: "1. 30天所有单词、句型全覆盖复盘\n2. 前期所有易错点、难点二次巩固\n3. 整体梳理知识体系，形成完整记忆链条",
+                tasks: ["完整默写30天核心高频单词，做到零错误", "熟练脱口而出所有核心句型，随机应答无压力", "自主完成10组综合情景对话，灵活运用所学知识", "复盘全程学习内容，巩固艾宾浩斯记忆成果"]
+            }
+        ];
+
+        // ================================================================
+        // 渲染逻辑
+        // ================================================================
+        var currentDayIndex = 0;
+        var daySelect = document.getElementById('daySelect');
+        var dateIndicator = document.getElementById('dateIndicator');
+        var dayBadge = document.getElementById('dayBadge');
+        var wordsContent = document.getElementById('wordsContent');
+        var textContent = document.getElementById('textContent');
+        var reviewContent = document.getElementById('reviewContent');
+        var taskList = document.getElementById('taskList');
+        var dailyCheck = document.getElementById('dailyCheck');
+
+        function initSelect() {
+            daySelect.innerHTML = '';
+            for (var i = 0; i < daysData.length; i++) {
+                var opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = '第 ' + daysData[i].day + ' 天';
+                daySelect.appendChild(opt);
+            }
+        }
+
+        function renderDay(index) {
+            var data = daysData[index];
+            if (!data) return;
+            dateIndicator.textContent = '📅 第 ' + data.day + ' 天';
+            dayBadge.textContent = '⭐ 第 ' + data.day + ' 天 ⭐';
+            daySelect.value = index;
+
+            // 新词
+            if (data.newWords && data.newWords.length > 0) {
+                var tableHtml = '<table><thead><tr><th>序号</th><th>英文</th><th>音标</th><th>音节</th><th>释义</th></tr></thead><tbody>';
+                for (var i = 0; i < data.newWords.length; i++) {
+                    var w = data.newWords[i];
+                    tableHtml += '<tr><td>' + w.sn + '</td><td>' + w.en + '</td><td>' + w.ipa + '</td><td>' + w.syl + '</td><td>' + w.zh + '</td></tr>';
+                }
+                tableHtml += '</tbody></table>';
+                wordsContent.innerHTML = tableHtml;
+            } else {
+                wordsContent.innerHTML = '<div class="no-words">📌 今日无新词，全面复习</div>';
+            }
+
+            // 课文
+            if (data.text) {
+                var sentences = data.text.split('\n');
+                var html = '';
+                for (var i = 0; i < sentences.length; i++) {
+                    if (sentences[i].trim() !== '') {
+                        html += '<span class="sentence">' + sentences[i] + '</span>';
+                    }
+                }
+                textContent.innerHTML = html;
+            } else {
+                textContent.textContent = '（无课文）';
+            }
+
+            // 复习
+            var reviewHtml = data.review || '无复习内容';
+            reviewHtml = reviewHtml.replace(/第(\d+)天/g, function(match, dayNum) {
+                var idx = -1;
+                for (var i = 0; i < daysData.length; i++) {
+                    if (daysData[i].day === parseInt(dayNum)) { idx = i; break; }
+                }
+                if (idx !== -1) {
+                    return '<a href="#" data-day-index="' + idx + '">第' + dayNum + '天</a>';
+                }
+                return match;
+            });
+            reviewHtml = reviewHtml.replace(/\n/g, '<br>');
+            reviewContent.innerHTML = reviewHtml;
+
+            var links = reviewContent.querySelectorAll('a[data-day-index]');
+            for (var i = 0; i < links.length; i++) {
+                links[i].addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var idx = parseInt(this.getAttribute('data-day-index'));
+                    if (!isNaN(idx) && idx >= 0 && idx < daysData.length) {
+                        currentDayIndex = idx;
+                        renderDay(currentDayIndex);
+                    }
+                });
+            }
+
+            // 任务
+            taskList.innerHTML = '';
+            if (data.tasks && data.tasks.length) {
+                for (var i = 0; i < data.tasks.length; i++) {
+                    var li = document.createElement('li');
+                    li.textContent = data.tasks[i];
+                    taskList.appendChild(li);
+                }
+            } else {
+                taskList.innerHTML = '<li>无任务</li>';
+            }
+
+            // 打卡框
+            var key = 'check_day_' + data.day;
+            var saved = localStorage.getItem(key);
+            dailyCheck.checked = (saved === 'true');
+            dailyCheck.onchange = function() {
+                localStorage.setItem(key, this.checked);
+            };
+        }
+
+        function goToDay(index) {
+            if (index < 0) index = 0;
+            if (index >= daysData.length) index = daysData.length - 1;
+            currentDayIndex = index;
+            renderDay(currentDayIndex);
+        }
+
+        document.getElementById('prevDayBtn').addEventListener('click', function() { goToDay(currentDayIndex - 1); });
+        document.getElementById('nextDayBtn').addEventListener('click', function() { goToDay(currentDayIndex + 1); });
+        daySelect.addEventListener('change', function() { goToDay(parseInt(this.value)); });
+
+        // 截图模式切换
+        document.getElementById('screenshotToggle').addEventListener('click', function() {
+            document.body.classList.toggle('screenshot-mode');
+            if (document.body.classList.contains('screenshot-mode')) {
+                this.textContent = '🔓 退出截图';
+                this.classList.remove('active');
+                window.scrollTo(0, 0);
+            } else {
+                this.textContent = '🔒 进入截图';
+                this.classList.add('active');
+            }
+        });
+
+        // 页面加载后自动进入截图模式
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('screenshot-mode');
+            initSelect();
+            goToDay(0);
+        });
+    </script>
+</body>
+</html>
