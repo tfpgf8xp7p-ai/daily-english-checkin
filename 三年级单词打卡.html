@@ -16,6 +16,7 @@
             padding: 20px;
             color: #2d3a4a;
             transition: background 0.3s;
+            user-select: none;
         }
         body.screenshot-mode {
             background: white !important;
@@ -29,13 +30,17 @@
         }
         body.screenshot-mode .nav-bar,
         body.screenshot-mode .float-deco,
-        body.screenshot-mode .screenshot-toggle {
+        body.screenshot-mode .screenshot-toggle,
+        body.screenshot-mode .mode-hint {
             display: none !important;
         }
         body.screenshot-mode .container::before,
         body.screenshot-mode .container::after,
         body.screenshot-mode .words-area::before {
             display: none !important;
+        }
+        body:not(.screenshot-mode) .screenshot-toggle {
+            display: block !important;
         }
 
         .container {
@@ -85,10 +90,28 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             border: 3px solid white;
             font-family: inherit;
+            display: none;
         }
         .screenshot-toggle:hover { transform: scale(1.05); background: #558a74; }
         .screenshot-toggle.active { background: #c0392b; }
         .screenshot-toggle.active:hover { background: #a93226; }
+
+        .mode-hint {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            z-index: 9998;
+            pointer-events: none;
+            opacity: 0.7;
+            font-family: inherit;
+        }
+        body.screenshot-mode .mode-hint { display: block; }
+        body:not(.screenshot-mode) .mode-hint { display: none; }
 
         .header {
             background: linear-gradient(135deg, #d4e8f0, #b8dce8);
@@ -250,6 +273,7 @@
             .header h1 { font-size: 1.4rem; }
             .header::before, .header::after { font-size: 1.4rem; }
             .screenshot-toggle { bottom: 10px; right: 10px; padding: 8px 16px; font-size: 0.8rem; }
+            .mode-hint { bottom: 70px; right: 10px; font-size: 0.65rem; }
         }
 
         @media print {
@@ -257,6 +281,7 @@
             .container { max-width: 100%; box-shadow: none; border: none; padding: 0.2cm; background: white; }
             .nav-bar { display: none !important; }
             .screenshot-toggle { display: none !important; }
+            .mode-hint { display: none !important; }
             .grid { gap: 8px; }
             .section { border: 2px solid #ccc; box-shadow: none; break-inside: avoid; }
             .words-area { background: #ffe9e0 !important; }
@@ -274,6 +299,7 @@
 <body>
 
     <button class="screenshot-toggle" id="screenshotToggle">🔓 退出截图</button>
+    <div class="mode-hint">💡 双击页面切换模式</div>
 
     <div class="container" id="app">
         <div style="position:absolute; top:6px; left:6px; font-size:2rem; opacity:0.10; pointer-events:none;">☁️ 🌟 ☁️</div>
@@ -321,10 +347,10 @@
 
     <script>
         // ================================================================
-        // 完整 30 天数据（全部填充）
+        // 完整 30 天数据
         // ================================================================
         var daysData = [
-            // ===== 第1天 =====
+            // 第1天
             {
                 day: 1,
                 newWords: [
@@ -348,7 +374,7 @@
                 review: "无复习内容，今日全新学习开篇单元",
                 tasks: ["全部新词逐词拼读、拆分音节，中英交替朗读 5 遍，遮挡中文默写 3 遍", "完整课文朗读 3 遍，边读同步做配套动作"]
             },
-            // ===== 第2天 =====
+            // 第2天
             {
                 day: 2,
                 newWords: [
@@ -373,7 +399,7 @@
                 review: "完整复习第 1 天三上 Starter Unit 全部单词",
                 tasks: ["复习昨天全部单词，口头中英互译，易错单词抄写 2 行", "今日新词完整拼读，遮挡英文默写", "和家人分角色完整朗读对话 3 遍"]
             },
-            // ===== 第3天 =====
+            // 第3天
             {
                 day: 3,
                 newWords: [
@@ -406,7 +432,7 @@
                 review: "完整复习第 2 天三上 Unit1 Hello 全部单词",
                 tasks: ["复习问候单元单词，熟练问答自我介绍句型", "分段背诵数字 0-10，独立完整默写", "通读三段数字问答对话"]
             },
-            // ===== 第4天 =====
+            // 第4天
             {
                 day: 4,
                 newWords: [
@@ -432,7 +458,7 @@
                 review: "1. 复习第 3 天三上 Unit2 Numbers 全套单词\n2. 复习第 1 天三上 Starter Unit 单词（新学第 2 天周期巩固）",
                 tasks: ["听写数字、开篇基础单词，订正全部写错词汇", "拆分音节背诵所有颜色单词，完整默写", "朗读颜色主题对话 2 遍"]
             },
-            // ===== 第5天 =====
+            // 第5天
             {
                 day: 5,
                 newWords: [
@@ -461,7 +487,7 @@
                 review: "完整复习第 4 天三上 Unit3 Colours 全部单词",
                 tasks: ["口头完整问答所有颜色相关句型", "默写前三单元易混淆词汇，标记易错词", "通读 Starter 至 Unit3 全部对话"]
             },
-            // ===== 第6天 =====
+            // 第6天
             {
                 day: 6,
                 newWords: [
@@ -490,7 +516,7 @@
                 review: "完整复习第 5 天三上 Revision1 汇总单词",
                 tasks: ["抽查前五单元单词中英互译，查漏补缺", "完整默写文具、方位介词单词", "分角色扮演两段寻找物品对话"]
             },
-            // ===== 第7天 =====
+            // 第7天
             {
                 day: 7,
                 newWords: [
@@ -517,7 +543,7 @@
                 review: "1. 复习第 6 天三上 Unit4 文具全套单词\n2. 复习第 2 天三上 Unit1 单词（新学第 4 天周期巩固）",
                 tasks: ["复习文具、问候单元全部单词", "分段默写生日食物、礼物相关词汇", "完整背诵生日派对全部对话"]
             },
-            // ===== 第8天 =====
+            // 第8天
             {
                 day: 8,
                 newWords: [
@@ -541,7 +567,7 @@
                 review: "完整复习第 7 天三上 Unit5 生日单元全部单词",
                 tasks: ["口头完整背诵生日全套对话", "默写教室物品、方位短语", "朗读教室问答对话 3 遍"]
             },
-            // ===== 第9天 =====
+            // 第9天
             {
                 day: 9,
                 newWords: [
@@ -570,7 +596,7 @@
                 review: "完整复习第 8 天三上 Unit6 教室全套单词",
                 tasks: ["完整默写所有教室方位短语", "听写上册 4-6 单元易混淆单词", "通读三年级上册全部单元课文"]
             },
-            // ===== 第10天 =====
+            // 第10天
             {
                 day: 10,
                 newWords: [
@@ -594,7 +620,7 @@
                 review: "1. 复习第 9 天三上 Revision2 汇总单词\n2. 复习第 3 天三上 Unit2 数字单词（新学第 4 天周期巩固）",
                 tasks: ["复习上册后半册、全套数字单词", "分段背诵下册开篇单词并完整默写", "朗读问候动作歌谣 3 遍"]
             },
-            // ===== 第11天 =====
+            // 第11天
             {
                 day: 11,
                 newWords: [
@@ -624,7 +650,7 @@
                 review: "完整复习第 10 天下册 Starter Unit 全套单词",
                 tasks: ["朗读复习开篇问候歌谣", "重点区分动物单复数变形，全部默写", "分角色背诵宠物问答句型"]
             },
-            // ===== 第12天 =====
+            // 第12天
             {
                 day: 12,
                 newWords: [
@@ -644,7 +670,7 @@
                 review: "完整复习第 11 天下册 Unit1 宠物全套单词",
                 tasks: ["抽查全部动物单复数单词", "按顺序背诵、完整默写七天词汇", "熟读星期问答对话"]
             },
-            // ===== 第13天 =====
+            // 第13天
             {
                 day: 13,
                 newWords: [
@@ -665,7 +691,7 @@
                 review: "1. 复习第 12 天下册 Unit2 星期全套单词\n2. 复习第 1 天三上 Starter 单词（新学第 7 天大周期巩固）",
                 tasks: ["完整复习星期、开篇基础单词", "衣物单词拼读默写，熟练掌握 I'm wearing 句型", "角色扮演穿衣主题对话"]
             },
-            // ===== 第14天 =====
+            // 第14天
             {
                 day: 14,
                 newWords: [
@@ -694,7 +720,7 @@
                 review: "完整复习第 13 天下册 Unit3 衣物全套单词",
                 tasks: ["操练现在进行时穿衣问答句型", "听写下册前三单元汇总单词，订正全部错题", "通读下册 Starter 至 Unit3 全部课文"]
             },
-            // ===== 第15天 =====
+            // 第15天
             {
                 day: 15,
                 newWords: [
@@ -716,7 +742,7 @@
                 review: "1. 复习第 14 天下册 Revision1 汇总单词\n2. 复习第 5 天三上 Revision1 单词（新学第 4 天周期巩固）",
                 tasks: ["复习上下册前半部分汇总词汇", "完整默写全部情绪类形容词", "熟读感受问答对话"]
             },
-            // ===== 第16天 =====
+            // 第16天
             {
                 day: 16,
                 newWords: [
@@ -739,7 +765,7 @@
                 review: "完整复习第 15 天下册 Unit4 情绪全套单词",
                 tasks: ["口头熟练问答 How do you feel?", "区分蔬菜、水果词汇，完整默写", "朗读食物主题对话 2 遍"]
             },
-            // ===== 第17天 =====
+            // 第17天
             {
                 day: 17,
                 newWords: [
@@ -765,7 +791,7 @@
                 review: "完整复习第 16 天下册 Unit5 食物全套单词",
                 tasks: ["完整默写全部食物词汇", "重点背诵身体特殊复数变形单词", "边指身体部位边跟读歌谣"]
             },
-            // ===== 第18天 =====
+            // 第18天
             {
                 day: 18,
                 newWords: [
@@ -794,7 +820,7 @@
                 review: "完整复习第 17 天下册 Unit6 身体全套单词",
                 tasks: ["熟练背诵身体部位完整歌谣", "听写下册后半单元单词，标记变形易错词汇", "通读下册 Unit4 至 Unit6 全部课文"]
             },
-            // ===== 第19天 =====
+            // 第19天
             {
                 day: 19,
                 newWords: [
@@ -823,7 +849,7 @@
                 review: "1. 复习第 18 天下册 Revision2 汇总单词\n2. 复习第 7 天三上 Unit5 生日单词（新学第 4 天周期巩固）",
                 tasks: ["复习下册后半单元、生日全套单词", "拆分音节反复默写上册长难易错单词", "随机抽取上册课文脱稿朗读"]
             },
-            // ===== 第20天 =====
+            // 第20天
             {
                 day: 20,
                 newWords: [
@@ -852,7 +878,7 @@
                 review: "完整复习第 19 天三上全册易错单词",
                 tasks: ["完整听写上册全部易错单词，订正所有错误", "集中默写下册变形难点词汇", "完成第一轮新词全部学习，通读全套课文"]
             },
-            // ===== 第21天（复习） =====
+            // 第21天（复习）
             {
                 day: 21,
                 newWords: [
@@ -909,7 +935,7 @@
                 review: "1. 三上Unit3 Colours 全套颜色单词\n2. 三下Starter Unit 全套问候动作单词\n3. 三下Unit1 Animals 全套动物单词（含单复数变形）",
                 tasks: ["三组复习单词完整听写，先看中文说英文，再看英文说中文", "重点区分mouse/mice、foot/feet、tooth/teeth等复数变形", "对应三篇课文各完整朗读一遍，做到不卡词"]
             },
-            // ===== 第22天（复习） =====
+            // 第22天（复习）
             {
                 day: 22,
                 newWords: [
@@ -958,7 +984,7 @@
                 review: "1. 三上Unit4 School Things 全套文具方位单词\n2. 三下Unit2 Days of the week 全套星期单词\n3. 三下Unit3 Clothes 全套衣物单词",
                 tasks: ["遮挡中文默写全部英文单词，标记写错词汇", "每个错误单词抄写3遍，再独立听写1遍", "操练句型：Where is...? What day is it? What are you wearing?"]
             },
-            // ===== 第23天（复习） =====
+            // 第23天（复习）
             {
                 day: 23,
                 newWords: [
@@ -997,7 +1023,7 @@
                 review: "1. 三上Unit5 Classroom 全套教室物品、方位介词单词及短语\n2. 前期动物、星期、衣物高频单词复盘\n3. 基础日常交际句型复盘",
                 tasks: ["熟记所有教室物品及方位介词，能看图快速说出英文", "熟练运用Where's...? 方位句型造句、问答", "通读复盘所有旧单词，筛选遗忘词汇重点标记"]
             },
-            // ===== 第24天（数字1-20） =====
+            // 第24天（数字1-20）
             {
                 day: 24,
                 newWords: [
@@ -1026,7 +1052,7 @@
                 review: "1. 三上Unit6 Numbers 1-20 全套数字单词\n2. 数字计数核心句型复盘\n3. 前期易错单复数单词二次复盘",
                 tasks: ["熟练认读、拼写1-20所有数字单词，做到零出错", "随机抽查数字听写，重点掌握11-20易混单词", "熟练运用How many...? 句型问答计数"]
             },
-            // ===== 第25天（情绪） =====
+            // 第25天（情绪）
             {
                 day: 25,
                 newWords: [
@@ -1045,7 +1071,7 @@
                 review: "1. 三下Unit4 Feelings 全套情绪类单词\n2. 情绪问答核心句型复盘\n3. 1-20数字单词二次巩固复盘",
                 tasks: ["背诵所有情绪单词，能看图快速说出对应英文", "两两操练情绪问答句型，熟练脱口而出", "默写1-20数字单词，查漏补缺"]
             },
-            // ===== 第26天（季节） =====
+            // 第26天（季节）
             {
                 day: 26,
                 newWords: [
@@ -1064,7 +1090,7 @@
                 review: "1. 三下Unit5 Seasons 全套季节、天气单词\n2. 季节天气问答句型复盘\n3. 情绪类单词及句型二次复盘",
                 tasks: ["熟记四季及天气形容词，精准匹配对应季节特征", "完整背诵季节问答对话，流利朗读无卡顿", "默写所有季节天气单词，纠正拼写错误"]
             },
-            // ===== 第27天（动作能力） =====
+            // 第27天（动作能力）
             {
                 day: 27,
                 newWords: [
@@ -1083,7 +1109,7 @@
                 review: "1. 三下Unit6 Abilities 全套动作、能力类单词\n2. can能力问答核心句型复盘\n3. 四季天气、情绪类单词及句型综合复盘",
                 tasks: ["熟记所有动作单词，做到听读、默写零失误", "熟练运用What can you do? 句型自由问答、造句", "整合近期所有复盘单词，整理个人易错词汇本"]
             },
-            // ===== 第28天（综合复盘） =====
+            // 第28天（综合复盘）
             {
                 day: 28,
                 newWords: [
@@ -1098,7 +1124,7 @@
                 review: "1. 30天打卡所有核心单词全科复盘\n2. 五大类高频必考句型整合背诵\n3. 筛选全程易错单词、句型重点攻克",
                 tasks: ["通读所有分类单词，查漏补缺，标记遗忘词汇", "熟练背诵5大核心句型，做到随机提问脱口而出", "自主造句练习，每类句型造3个完整句子"]
             },
-            // ===== 第29天（易错专项） =====
+            // 第29天（易错专项）
             {
                 day: 29,
                 newWords: [
@@ -1113,7 +1139,7 @@
                 review: "1. 全程高频易错单词集中攻克\n2. 句型语法易错点专项纠错记忆\n3. 针对性默写易错词汇、句型",
                 tasks: ["专项默写所有易错单词，纠正拼写、读音错误", "背诵易错句型，牢记语法规则，规避失分点", "整理个人专属易错错题本，巩固记忆"]
             },
-            // ===== 第30天（终极总复盘） =====
+            // 第30天（终极总复盘）
             {
                 day: 30,
                 newWords: [],
@@ -1124,7 +1150,7 @@
         ];
 
         // ================================================================
-        // 渲染逻辑
+        // 核心功能
         // ================================================================
         var currentDayIndex = 0;
         var daySelect = document.getElementById('daySelect');
@@ -1135,6 +1161,18 @@
         var reviewContent = document.getElementById('reviewContent');
         var taskList = document.getElementById('taskList');
         var dailyCheck = document.getElementById('dailyCheck');
+        var toggleBtn = document.getElementById('screenshotToggle');
+
+        function getTodayDayIndex() {
+            var start = new Date(2026, 6, 16);
+            var today = new Date();
+            start.setHours(0,0,0,0);
+            today.setHours(0,0,0,0);
+            var diff = Math.floor((today - start) / (1000*60*60*24));
+            if (diff < 0) return 0;
+            if (diff >= 30) return 29;
+            return diff;
+        }
 
         function initSelect() {
             daySelect.innerHTML = '';
@@ -1153,7 +1191,6 @@
             dayBadge.textContent = '⭐ 第 ' + data.day + ' 天 ⭐';
             daySelect.value = index;
 
-            // 新词
             if (data.newWords && data.newWords.length > 0) {
                 var tableHtml = '<table><thead><tr><th>序号</th><th>英文</th><th>音标</th><th>音节</th><th>释义</th></tr></thead><tbody>';
                 for (var i = 0; i < data.newWords.length; i++) {
@@ -1166,7 +1203,6 @@
                 wordsContent.innerHTML = '<div class="no-words">📌 今日无新词，全面复习</div>';
             }
 
-            // 课文
             if (data.text) {
                 var sentences = data.text.split('\n');
                 var html = '';
@@ -1180,7 +1216,6 @@
                 textContent.textContent = '（无课文）';
             }
 
-            // 复习
             var reviewHtml = data.review || '无复习内容';
             reviewHtml = reviewHtml.replace(/第(\d+)天/g, function(match, dayNum) {
                 var idx = -1;
@@ -1207,7 +1242,6 @@
                 });
             }
 
-            // 任务
             taskList.innerHTML = '';
             if (data.tasks && data.tasks.length) {
                 for (var i = 0; i < data.tasks.length; i++) {
@@ -1219,7 +1253,6 @@
                 taskList.innerHTML = '<li>无任务</li>';
             }
 
-            // 打卡框
             var key = 'check_day_' + data.day;
             var saved = localStorage.getItem(key);
             dailyCheck.checked = (saved === 'true');
@@ -1235,28 +1268,42 @@
             renderDay(currentDayIndex);
         }
 
+        function toggleScreenshotMode(show) {
+            if (show !== undefined) {
+                if (show) document.body.classList.add('screenshot-mode');
+                else document.body.classList.remove('screenshot-mode');
+            } else {
+                document.body.classList.toggle('screenshot-mode');
+            }
+            var isActive = document.body.classList.contains('screenshot-mode');
+            if (isActive) {
+                toggleBtn.textContent = '🔓 退出截图';
+                toggleBtn.classList.remove('active');
+                toggleBtn.style.display = 'none';
+            } else {
+                toggleBtn.textContent = '🔒 进入截图';
+                toggleBtn.classList.add('active');
+                toggleBtn.style.display = 'block';
+            }
+        }
+
         document.getElementById('prevDayBtn').addEventListener('click', function() { goToDay(currentDayIndex - 1); });
         document.getElementById('nextDayBtn').addEventListener('click', function() { goToDay(currentDayIndex + 1); });
         daySelect.addEventListener('change', function() { goToDay(parseInt(this.value)); });
 
-        // 截图模式切换
-        document.getElementById('screenshotToggle').addEventListener('click', function() {
-            document.body.classList.toggle('screenshot-mode');
-            if (document.body.classList.contains('screenshot-mode')) {
-                this.textContent = '🔓 退出截图';
-                this.classList.remove('active');
-                window.scrollTo(0, 0);
-            } else {
-                this.textContent = '🔒 进入截图';
-                this.classList.add('active');
-            }
+        toggleBtn.addEventListener('click', function() { toggleScreenshotMode(); });
+
+        document.addEventListener('dblclick', function(e) {
+            var tag = e.target.tagName.toLowerCase();
+            if (tag === 'button' || tag === 'select' || tag === 'input' || tag === 'a') return;
+            toggleScreenshotMode();
         });
 
-        // 页面加载后自动进入截图模式
         document.addEventListener('DOMContentLoaded', function() {
-            document.body.classList.add('screenshot-mode');
             initSelect();
-            goToDay(0);
+            var todayIndex = getTodayDayIndex();
+            goToDay(todayIndex);
+            toggleScreenshotMode(true);
         });
     </script>
 </body>
