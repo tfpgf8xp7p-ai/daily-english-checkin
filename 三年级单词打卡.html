@@ -379,7 +379,7 @@
 
     <script>
         // ================================================================
-        // 完整 30 天数据（全部替换为“空中笔画写 + 音节读记”模式）
+        // 完整 30 天数据（任务全部替换为“空中笔画写 + 音节读记”模式）
         // ================================================================
         var daysData = [
             // 第1天
@@ -1302,7 +1302,7 @@
         ];
 
         // ================================================================
-        // 核心逻辑（模式切换、渲染等）
+        // 核心逻辑：渲染、模式切换、URL参数
         // ================================================================
         var currentDayIndex = 0;
         var daySelect = document.getElementById('daySelect');
@@ -1439,6 +1439,7 @@
             }
         }
 
+        // 按钮事件
         normalBtn.addEventListener('click', function() { setMode('normal'); });
         friendBtn.addEventListener('click', function() { setMode('friend'); });
         screenshotBtn.addEventListener('click', function() { setMode('screenshot'); });
@@ -1447,11 +1448,21 @@
         document.getElementById('nextDayBtn').addEventListener('click', function() { goToDay(currentDayIndex + 1); });
         daySelect.addEventListener('change', function() { goToDay(parseInt(this.value)); });
 
+        // 页面加载：检测URL参数
         document.addEventListener('DOMContentLoaded', function() {
             initSelect();
             var todayIndex = getTodayDayIndex();
             goToDay(todayIndex);
-            setMode('normal');
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var modeParam = urlParams.get('mode');
+            if (modeParam === 'friend') {
+                setMode('friend');
+            } else if (modeParam === 'screenshot') {
+                setMode('screenshot');
+            } else {
+                setMode('normal');
+            }
         });
     </script>
 </body>
